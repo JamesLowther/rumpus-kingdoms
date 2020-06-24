@@ -62,6 +62,7 @@ async def on_message(ctx):
         if (not check_user_exists(ctx.author.id)):
             management.create_user(ctx)
 
+        # Handle actual bot commands
         if (bot.get_command(message_content)):
             await bot.process_commands(ctx)
 
