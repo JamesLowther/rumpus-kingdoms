@@ -1,0 +1,22 @@
+ 
+Each user can create a kingdom, or join someone elses
+Each kingdom is the capital
+
+Kingdoms gain population by purchasing rumpus land and founding villages.
+Each village has a rumpus level (this affects your kingdom's tax rate).
+Rumpus levels can be improved in a village by purchasing dance floors for the village (so they can rumpus better)
+
+Each kingdom has a military where you can purchase troop units (affect warfare)
+A kingdom can attack another kingdom to possibly gain that kingdom's villages, and population
+Warfare will result in lost troops for both sides, but there will only be one winner
+You can buy attack troops or defence shieldmen
+
+Winner is determined by number of troops, cumulative village rumpus level, and distance from kingdom capital
+
+If someone manages to capture the entire map, they are the Rumpus King
+
+Doubloons are taken from tax, RUMPUS RUNS (time when praising is accepted), and from winning warfare
+
+A leaderboard will exist for the kingdom with the most amount of rumpus land
+
+Users can dig for up to 3 rumpus relics per day.
