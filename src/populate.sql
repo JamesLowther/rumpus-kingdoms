@@ -17,7 +17,6 @@ CREATE TABLE Users (
 CREATE TABLE Kingdoms (
     kid             text,
     k_name          text,
-    balance         int,
     attack          int,
     defence         int,
     warcry          text,
