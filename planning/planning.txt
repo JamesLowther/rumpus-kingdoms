@@ -1,5 +1,5 @@
  
-Each user can create a kingdom, or join someone elses
+Each user can create a kingdom
 Each kingdom is the capital
 
 Kingdoms gain population by purchasing rumpus land and founding villages.

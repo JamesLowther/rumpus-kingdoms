@@ -13,7 +13,7 @@ PREFIX = "$rumpus "
 bot = commands.Bot(command_prefix=PREFIX)
 cfg.bot = bot
 
-import management
+import management, kingdoms
 
 
 def main():
