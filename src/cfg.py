@@ -1,4 +1,7 @@
 def init():
+    global PREFIX
+    PREFIX = "$r "
+
     global bot
     bot = None
 

@@ -6,14 +6,15 @@ import json, sqlite3
 import os, sys, re
 import cfg
 
+cfg.init()
+
 # Configure and create the bot
 # The bot is being stored as a builtin
 CONFIG_FILE = os.path.dirname(os.path.realpath(__file__)) + "/config.json"
-PREFIX = "$rumpus "
-bot = commands.Bot(command_prefix=PREFIX)
+bot = commands.Bot(command_prefix=cfg.PREFIX)
 cfg.bot = bot
 
-import management, kingdoms
+import management, kingdoms, user
 
 
 def main():
@@ -60,8 +61,8 @@ async def on_message(ctx):
     if ctx.author == bot.user:
         return
 
-    if ctx.content.startswith(PREFIX):
-        message_content = ctx.content[len(PREFIX) : len(ctx.content) + 1]
+    if ctx.content.startswith(cfg.PREFIX):
+        message_content = ctx.content[len(cfg.PREFIX) : len(ctx.content) + 1]
 
         # Check to see if user exists in the database
         if not check_user_exists(ctx.author.id):

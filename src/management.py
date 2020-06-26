@@ -5,7 +5,6 @@ from random import randint
 import cfg
 
 
-
 # Shuts down the bot and closes any open connections
 # Only users with root access can use this command
 @bot.command(name="shutdown")
@@ -30,7 +29,7 @@ def check_root(user_id):
 # Create the user in the database
 def create_user(ctx):
     cfg.db_cur.execute(
-        "INSERT INTO Users VALUES (?, 0, '', 'Serf', NULL);", (str(ctx.author.id),)
+        "INSERT INTO Users VALUES (?, 0, 'Serf', NULL);", (str(ctx.author.id),)
     )
     cfg.db_conn.commit()
 
