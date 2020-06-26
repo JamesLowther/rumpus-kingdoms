@@ -37,7 +37,7 @@ def create_user(ctx):
 # Generate a random ID for a table
 def unique_ID(table, column):
     while True:
-        new_id = randint(100000,999999)
+        new_id = randint(100000, 999999)
 
         cfg.db_cur.execute("SELECT * FROM " + table + "  WHERE ?=?;", (column, new_id))
 
