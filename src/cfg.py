@@ -1,4 +1,3 @@
-
 def init():
     global bot
     bot = None
