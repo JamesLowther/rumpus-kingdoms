@@ -48,6 +48,7 @@ def create_kingdom(ctx, kingdom_name):
     cfg.db_conn.commit()
 
 
+# Called if a user does not have a kingdom but should
 async def handle_no_kingdom(ctx):
     await ctx.channel.send(
         "Please use the command: `"
@@ -56,6 +57,7 @@ async def handle_no_kingdom(ctx):
     )
 
 
+# Called if a user already has a kingdom but shouldn't
 async def handle_existing_kingdom(ctx):
     await ctx.channel.send("You already have a kingdom " + str(ctx.author) + "!")
 
