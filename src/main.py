@@ -2,7 +2,7 @@
 
 import discord
 from discord.ext import commands
-import json, sqlite3
+import sqlite3
 import os, sys, re
 import cfg
 
@@ -10,7 +10,6 @@ cfg.init()
 
 # Configure and create the bot
 # The bot is being stored as a builtin
-CONFIG_FILE = os.path.dirname(os.path.realpath(__file__)) + "/config.json"
 bot = commands.Bot(command_prefix=cfg.PREFIX)
 cfg.bot = bot
 
@@ -18,27 +17,20 @@ import management, kingdoms, user
 
 
 def main():
-    (bot_token, root_ids, db_path) = read_json()
+    (
+        bot_token,
+        root_ids,
+        db_path,
+        attack_options,
+        defence_options,
+    ) = management.read_json()
     cfg.root_ids = root_ids
+    cfg.attack_options = attack_options
+    cfg.defence_options = defence_options
 
     connect_db(db_path)
 
     cfg.bot.run(bot_token)
-
-
-# Read the configuration file
-# Sets the global variables in cfg.py
-def read_json():
-    with open(CONFIG_FILE) as f:
-        data = json.load(f)
-
-        bot_token = data["bot_token"]
-        root_ids = data["root_ids"]
-        db_path = os.path.dirname(os.path.realpath(__file__)) + "/" + data["db_name"]
-
-        f.close()
-
-        return (bot_token, root_ids, db_path)
 
 
 # Connect to the sqlite3 database

@@ -8,6 +8,10 @@ def init():
     global root_ids
     root_ids = None
 
+    global attack_options, defence_options
+    attack_options = None
+    defence_options = None
+
     global db_conn, db_cur
     db_conn = None
     db_cur = None

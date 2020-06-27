@@ -1,5 +1,29 @@
 {
     "db_name": "database.db",
     "bot_token": "NzI0MTI4MzYwNDg1MzU1NTgw.Xu7rOw.0Cr-P4KJi0NDYSGCsTJNkqt6Cdg",
-    "root_ids": [167403984171040768]
+    "root_ids": [167403984171040768],
+    "attack_options": [
+        {
+            "name": "Rumpus Warrior",
+            "price": 100,
+            "attack": 1
+        },
+        {
+            "name": "Rumpus Spearman",
+            "price": 200,
+            "attack": 2
+        }
+    ],
+    "defence_options": [
+        {
+            "name": "Rumpus Shieldman",
+            "price": 100,
+            "defence": 1
+        },
+        {
+            "name": "Rumpus Vanguard",
+            "price": 300,
+            "defence": 2
+        }
+    ]
 }

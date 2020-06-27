@@ -8,6 +8,7 @@ CREATE TABLE Users (
     uid             text,
     doubloons       int,
     rank            text,
+    block           int,
     kid             text,
     PRIMARY KEY (uid),
     FOREIGN KEY (kid) REFERENCES Kingdoms
