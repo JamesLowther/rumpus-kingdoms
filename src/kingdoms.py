@@ -109,6 +109,7 @@ async def rename_kingdom(ctx, *args):
     await ctx.channel.send("Kingdom renamed to '" + new_name + "'.")
 
 
+# Command to purchase new units
 @bot.command(name="purchase")
 async def buy_troops(ctx, *args):
     # User doesn't have a kingdom
@@ -132,8 +133,8 @@ async def buy_troops(ctx, *args):
         return
 
     # Check if amount is valid
-    if len(args) == 2 and args[1].isnumeric() and args[1] > 0:
-        amount_to_purchase = args[1]
+    if len(args) == 2 and args[1].isnumeric() and int(args[1]) > 0:
+        amount_to_purchase = int(args[1])
     else:
         amount_to_purchase = 1
 
@@ -147,7 +148,7 @@ async def buy_troops(ctx, *args):
             await ctx.channel.send(">>> Sorry, you don't have enough doubloons to purchase that defence unit. Purchase cancelled.")
             return
 
-        purchased = purchase_defence_unit(ctx, to_purchase)
+        purchased = purchase_defence_unit(ctx, to_purchase, amount_to_purchase)
 
     # Purchase defence unit
     else:
@@ -157,12 +158,14 @@ async def buy_troops(ctx, *args):
             await ctx.channel.send(">>> Sorry, you don't have enough doubloons to purchase that attack unit. Purchase cancelled.")
             return
 
-        purchased = purchase_attack_unit(ctx, to_purchase)
+        purchased = purchase_attack_unit(ctx, to_purchase, amount_to_purchase)
 
     await ctx.channel.send(
-        ">>> Purchased unit '"
+        ">>> Purchased "
+        + str(amount_to_purchase)
+        + " '"
         + str(purchased["name"])
-        + "' for `"
+        + "' unit(s) for `"
         + str(purchased["price"] * amount_to_purchase)
         + "` doubloons."
     )
@@ -171,7 +174,6 @@ async def buy_troops(ctx, *args):
 # Displays all purchasable units
 # todo: this code is messy
 async def show_purchase_options(ctx):
-
     # Generate string of categories
     to_send = ">>> "
     to_send += create_table(
@@ -189,9 +191,10 @@ async def show_purchase_options(ctx):
         cfg.defence_options,
         len(cfg.attack_options),
     )
-    to_send += "\nEnter the index of the unit you would like to purchase, or type 'cancel' to exit."
+    to_send += "\nUse the command `" + cfg.PREFIX + "purchase <index> [amount]` to purchase units."
 
     await ctx.channel.send(to_send)
+
 
 # Creates a table from the data in a discord markup string
 # headers and key lists must be the same length
@@ -249,16 +252,16 @@ def check_funds_available(ctx, price, amount):
 
 # Purchase an attack unit
 # Returns the purchased unit
-def purchase_attack_unit(ctx, to_purchase):
+def purchase_attack_unit(ctx, to_purchase, amount):
     # Remove price from user's doubloon balance
     cfg.db_cur.execute("UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
-        (to_purchase['price'], str(ctx.author.id))
+        (to_purchase['price'] * amount, str(ctx.author.id))
     )
 
     # Add attack value to kingdom
     cfg.db_cur.execute(
         "UPDATE Kingdoms SET attack=attack + ? WHERE uid=?;",
-        (to_purchase['attack'], str(ctx.author.id)),
+        (to_purchase['attack'] * amount, str(ctx.author.id)),
     )
     
     cfg.db_conn.commit()
@@ -268,16 +271,16 @@ def purchase_attack_unit(ctx, to_purchase):
 
 # Purchase a defence unit
 # Returns the purchased unit
-def purchase_defence_unit(ctx, to_purchase):
+def purchase_defence_unit(ctx, to_purchase, amount):
     # Remove price from user's doubloon balance
     cfg.db_cur.execute("UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
-        (to_purchase['price'], str(ctx.author.id))
+        (to_purchase['price'] * amount, str(ctx.author.id))
     )
     
     # Add defence value to kingdom
     cfg.db_cur.execute(
         "UPDATE Kingdoms SET defence=defence + ? WHERE uid=?;",
-        (to_purchase["defence"], str(ctx.author.id)),
+        (to_purchase["defence"] * amount, str(ctx.author.id)),
     )
 
     cfg.db_conn.commit()

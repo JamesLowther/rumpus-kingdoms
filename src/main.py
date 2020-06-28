@@ -13,7 +13,7 @@ cfg.init()
 bot = commands.Bot(command_prefix=cfg.PREFIX)
 cfg.bot = bot
 
-import management, kingdoms, user
+import management, kingdoms, user, villages
 
 
 def main():
