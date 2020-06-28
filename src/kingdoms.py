@@ -117,9 +117,55 @@ async def buy_troops(ctx, *args):
         return
 
     # Show purchase options
-    if len(args) == 0:
+    if len(args) == 0 or not args[0].isnumeric():
         await show_purchase_options(ctx)
         return
+
+    index = int(args[0]) - 1
+
+    # Check if index is valid
+    if not (
+        index >= 0
+        and index <= len(cfg.attack_options) + len(cfg.defence_options) - 1
+    ):
+        await ctx.channel.send("Index out of range!")
+        return
+
+    # Check if amount is valid
+    if len(args) == 2 and args[1].isnumeric() and args[1] > 0:
+        amount_to_purchase = args[1]
+    else:
+        amount_to_purchase = 1
+
+    number_attack_units = len(cfg.attack_options)
+
+    # Purchase attack unit
+    if index > number_attack_units - 1:
+        to_purchase = cfg.defence_options[index - number_attack_units]
+
+        if not check_funds_available(ctx, to_purchase['price'], amount_to_purchase):
+            await ctx.channel.send(">>> Sorry, you don't have enough doubloons to purchase that defence unit. Purchase cancelled.")
+            return
+
+        purchased = purchase_defence_unit(ctx, to_purchase)
+
+    # Purchase defence unit
+    else:
+        to_purchase = cfg.attack_options[index]
+
+        if not check_funds_available(ctx, to_purchase['price'], amount_to_purchase):
+            await ctx.channel.send(">>> Sorry, you don't have enough doubloons to purchase that attack unit. Purchase cancelled.")
+            return
+
+        purchased = purchase_attack_unit(ctx, to_purchase)
+
+    await ctx.channel.send(
+        ">>> Purchased unit '"
+        + str(purchased["name"])
+        + "' for `"
+        + str(purchased["price"] * amount_to_purchase)
+        + "` doubloons."
+    )
 
 
 # Displays all purchasable units
@@ -146,63 +192,6 @@ async def show_purchase_options(ctx):
     to_send += "\nEnter the index of the unit you would like to purchase, or type 'cancel' to exit."
 
     await ctx.channel.send(to_send)
-
-    # Pre-condition check for wait_for function
-    def check(msg):
-        return (
-            msg.content.lower() in {"cancel"} or msg.content.isnumeric()
-        ) and msg.author.id == ctx.author.id
-
-    # Continue until valid index is entered
-    while True:
-        msg = await bot.wait_for("message", check=check)
-
-        # User cancelled the unit purchase
-        if msg.content.lower() == "cancel":
-            await ctx.channel.send("Unit purchase cancelled!")
-            return
-
-        index = int(msg.content) - 1
-
-        # Check if index is valid
-        if (
-            index >= 0
-            and index <= len(cfg.attack_options) + len(cfg.defence_options) - 1
-        ):
-            break
-
-        await ctx.channel.send("Index out of range!")
-
-    number_attack_units = len(cfg.attack_options)
-
-    # Purchase attack unit
-    if index > number_attack_units - 1:
-        to_purchase = cfg.defence_options[index - number_attack_units]
-
-        if not check_funds_available(ctx, to_purchase['price']):
-            await ctx.channel.send(">>> Sorry, you don't have enough doubloons to purchase that defence unit. Purchase cancelled.")
-            return
-
-        purchased = purchase_defence_unit(ctx, to_purchase)
-
-    # Purchase defence unit
-    else:
-        to_purchase = cfg.attack_options[index]
-
-        if not check_funds_available(ctx, to_purchase['price']):
-            await ctx.channel.send(">>> Sorry, you don't have enough doubloons to purchase that attack unit. Purchase cancelled.")
-            return
-
-        purchased = purchase_attack_unit(ctx, to_purchase)
-
-    await ctx.channel.send(
-        ">>> Purchased unit '"
-        + str(purchased["name"])
-        + "' for `"
-        + str(purchased["price"])
-        + "` doubloons."
-    )
-
 
 # Creates a table from the data in a discord markup string
 # headers and key lists must be the same length
@@ -249,23 +238,27 @@ def create_table(category, headers, keys, data, offset):
 
 
 # Check if a user can afford a certain price
-def check_funds_available(ctx, price):
+def check_funds_available(ctx, price, amount):
+    total_price = price * amount
+
     cfg.db_cur.execute("SELECT doubloons FROM Users WHERE uid=?;", (ctx.author.id,))
     result = cfg.db_cur.fetchone()
 
-    return result['doubloons'] >= price
+    return result['doubloons'] >= total_price
 
 
 # Purchase an attack unit
 # Returns the purchased unit
 def purchase_attack_unit(ctx, to_purchase):
+    # Remove price from user's doubloon balance
+    cfg.db_cur.execute("UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
+        (to_purchase['price'], str(ctx.author.id))
+    )
+
+    # Add attack value to kingdom
     cfg.db_cur.execute(
         "UPDATE Kingdoms SET attack=attack + ? WHERE uid=?;",
         (to_purchase['attack'], str(ctx.author.id)),
-    )
-
-    cfg.db_cur.execute("UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
-        (to_purchase['price'], str(ctx.author.id))
     )
     
     cfg.db_conn.commit()
@@ -276,13 +269,15 @@ def purchase_attack_unit(ctx, to_purchase):
 # Purchase a defence unit
 # Returns the purchased unit
 def purchase_defence_unit(ctx, to_purchase):
+    # Remove price from user's doubloon balance
+    cfg.db_cur.execute("UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
+        (to_purchase['price'], str(ctx.author.id))
+    )
+    
+    # Add defence value to kingdom
     cfg.db_cur.execute(
         "UPDATE Kingdoms SET defence=defence + ? WHERE uid=?;",
         (to_purchase["defence"], str(ctx.author.id)),
-    )
-
-    cfg.db_cur.execute("UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
-        (to_purchase['price'], str(ctx.author.id))
     )
 
     cfg.db_conn.commit()
