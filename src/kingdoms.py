@@ -16,7 +16,7 @@ async def init_kingdom(ctx, *args):
         await handle_no_kingdom(ctx)
         return
 
-    kingdom_name = args[0].capitalize()
+    kingdom_name = " ".join(args[0:])
 
     await ctx.channel.send(
         "Are you sure you would like to name your kingdom '" + kingdom_name + "'? (y/n)"
@@ -51,7 +51,7 @@ def create_kingdom(ctx, kingdom_name):
 # Called if a user does not have a kingdom but should
 async def handle_no_kingdom(ctx):
     await ctx.channel.send(
-        "Please use the command: `"
+        "Please use the command `"
         + cfg.PREFIX
         + "init <kingdom name>` to create a new kingdom."
     )
@@ -78,13 +78,13 @@ async def rename_kingdom(ctx, *args):
 
     if len(args) == 0:
         await ctx.channel.send(
-            "Please use the commnd: `"
+            "Please use the commnd `"
             + cfg.PREFIX
             + "rename <new name>` to rename your kingdom."
         )
         return
 
-    new_name = args[0].capitalize()
+    new_name = args[0]
 
     await ctx.channel.send(
         "Are you sure you would like to name your kingdom '" + new_name + "'? (y/n)"
@@ -126,8 +126,7 @@ async def buy_troops(ctx, *args):
 
     # Check if index is valid
     if not (
-        index >= 0
-        and index <= len(cfg.attack_options) + len(cfg.defence_options) - 1
+        index >= 0 and index <= len(cfg.attack_options) + len(cfg.defence_options) - 1
     ):
         await ctx.channel.send("Index out of range! Cancelling.")
         return
@@ -143,9 +142,11 @@ async def buy_troops(ctx, *args):
     # Purchase attack unit
     if index > number_attack_units - 1:
         to_purchase = cfg.defence_options[index - number_attack_units]
-        total_price = to_purchase['price'] * amount_to_purchase
+        total_price = to_purchase["price"] * amount_to_purchase
 
-        if not shared.check_funds_available(ctx, to_purchase['price'], amount_to_purchase):
+        if not shared.check_funds_available(
+            ctx, to_purchase["price"], amount_to_purchase
+        ):
             await ctx.channel.send(
                 ">>> Sorry, you need at least `"
                 + str(total_price)
@@ -158,14 +159,16 @@ async def buy_troops(ctx, *args):
     # Purchase defence unit
     else:
         to_purchase = cfg.attack_options[index]
-        total_price = to_purchase['price'] * amount_to_purchase
+        total_price = to_purchase["price"] * amount_to_purchase
 
-        if not shared.check_funds_available(ctx, to_purchase['price'], amount_to_purchase):
+        if not shared.check_funds_available(
+            ctx, to_purchase["price"], amount_to_purchase
+        ):
             await ctx.channel.send(
                 ">>> Sorry, you need at least `"
                 + str(total_price)
                 + "` doubloons to purchase those attack units. Purchase cancelled."
-            )         
+            )
             return
 
         purchased = await purchase_attack_unit(ctx, to_purchase, amount_to_purchase)
@@ -205,7 +208,11 @@ async def show_purchase_options(ctx):
         cfg.defence_options,
         len(cfg.attack_options),
     )
-    to_send += "\nUse the command `" + cfg.PREFIX + "purchase <index> [amount]` to purchase units."
+    to_send += (
+        "\nUse the command `"
+        + cfg.PREFIX
+        + "purchase <index> [amount]` to purchase units."
+    )
 
     await ctx.channel.send(to_send)
 
@@ -213,7 +220,7 @@ async def show_purchase_options(ctx):
 # Purchase an attack unit
 # Returns the purchased unit
 async def purchase_attack_unit(ctx, to_purchase, amount):
-    total_price = to_purchase['price'] * amount
+    total_price = to_purchase["price"] * amount
 
     # Pre-condition check for wait_for function
     def check(msg):
@@ -223,7 +230,7 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
         ">>> Are you sure you would like to purchase "
         + str(amount)
         + " '"
-        + str(to_purchase['name'])
+        + str(to_purchase["name"])
         + "' for `"
         + str(total_price)
         + str("` doubloon(s)? (y/n)")
@@ -237,14 +244,16 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
         return
 
     # Remove price from user's doubloon balance
-    shared.detract_funds(ctx, to_purchase['price'] * amount,)
+    shared.detract_funds(
+        ctx, to_purchase["price"] * amount,
+    )
 
     # Add attack value to kingdom
     cfg.db_cur.execute(
         "UPDATE Kingdoms SET attack=attack + ? WHERE uid=?;",
-        (to_purchase['attack'] * amount, str(ctx.author.id)),
+        (to_purchase["attack"] * amount, str(ctx.author.id)),
     )
-    
+
     cfg.db_conn.commit()
 
     return to_purchase
@@ -253,7 +262,7 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
 # Purchase a defence unit
 # Returns the purchased unit
 async def purchase_defence_unit(ctx, to_purchase, amount):
-    total_price = to_purchase['price'] * amount
+    total_price = to_purchase["price"] * amount
 
     # Pre-condition check for wait_for function
     def check(msg):
@@ -263,7 +272,7 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
         ">>> Are you sure you would like to purchase "
         + str(amount)
         + " '"
-        + str(to_purchase['name'])
+        + str(to_purchase["name"])
         + "' for `"
         + str(total_price)
         + str("` doubloon(s)? (y/n)")
@@ -277,8 +286,8 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
         return
 
     # Remove price from user's doubloon balance
-    shared.detract_funds(ctx, to_purchase['price'] * amount)
-    
+    shared.detract_funds(ctx, to_purchase["price"] * amount)
+
     # Add defence value to kingdom
     cfg.db_cur.execute(
         "UPDATE Kingdoms SET defence=defence + ? WHERE uid=?;",

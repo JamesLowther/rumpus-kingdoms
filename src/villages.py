@@ -23,23 +23,35 @@ async def village_options(ctx, *args):
 
     elif action == "buy":
         if len(args) < 2:
-            await ctx.channel.send(">>> Use the command `" + cfg.PREFIX + "village buy <name>` to purchase a new village.")
+            await ctx.channel.send(
+                ">>> Use the command `"
+                + cfg.PREFIX
+                + "village buy <name>` to purchase a new village."
+            )
             return
 
         await buy_village(ctx, args)
 
     elif action == "upgrade":
         if len(args) < 2:
-            await ctx.channel.send(">>> Use the command `" + cfg.PREFIX + "village upgrade <index>` to upgrade a village.")
+            await ctx.channel.send(
+                ">>> Use the command `"
+                + cfg.PREFIX
+                + "village upgrade <index>` to upgrade a village."
+            )
             return
 
     elif action == "rename":
         if len(args) < 3:
-            await ctx.channel.send(">>> Use the command `" + cfg.PREFIX + "village rename <index> <name>` to rename a village.")
+            await ctx.channel.send(
+                ">>> Use the command `"
+                + cfg.PREFIX
+                + "village rename <index> <name>` to rename a village."
+            )
             return
 
         await rename_village(ctx, args)
-        
+
     else:
         await show_village_help(ctx)
 
@@ -51,33 +63,35 @@ async def show_village_help(ctx):
 async def list_villages(ctx):
     cfg.db_cur.execute(
         "SELECT * FROM Villages v, Kingdoms k WHERE k.kid=v.kid AND k.uid=? ORDER BY v_name COLLATE NOCASE ASC, population DESC, vid ASC;",
-        (str(ctx.author.id),)
+        (str(ctx.author.id),),
     )
 
     results = cfg.db_cur.fetchall()
 
     to_send = ">>> "
     to_send += shared.create_table(
-        "Villages",
-        ["Name", "Population"],
-        ["v_name", "population"],
-        results,
-        0
+        "Villages", ["Name", "Population"], ["v_name", "population"], results, 0
     )
 
     await ctx.channel.send(to_send)
 
 
 async def buy_village(ctx, args):
-    village_name = " ".join(args[1:]).capitalize()
+    village_name = " ".join(args[1:])
     village_price = calculate_village_price()
 
     if not shared.check_funds_available(ctx, village_price, 1):
-        await ctx.channel.send(">>> Sorry, you need at least `" + str(village_price) + "` doubloons to purchase a new village. Purchase cancelled.")
+        await ctx.channel.send(
+            ">>> Sorry, you need at least `"
+            + str(village_price)
+            + "` doubloons to purchase a new village. Purchase cancelled."
+        )
         return
 
     await ctx.channel.send(
-        ">>> Are you sure you would like to buy the village called '" + village_name + "' for `"
+        ">>> Are you sure you would like to buy the village called '"
+        + village_name
+        + "' for `"
         + str(village_price)
         + "` doubloons? (y/n)"
     )
@@ -99,19 +113,18 @@ async def buy_village(ctx, args):
     # Get user's kingdom kid
     cfg.db_cur.execute(
         "SELECT k.kid FROM Kingdoms k, Users u WHERE u.uid=k.uid AND u.uid=?;",
-        (str(ctx.author.id),)
+        (str(ctx.author.id),),
     )
 
     result = cfg.db_cur.fetchone()
-    kid = result['kid']
-    
+    kid = result["kid"]
+
     # Add new village to database
 
     new_id = management.unique_ID("Villages", "vid")
 
     cfg.db_cur.execute(
-        "INSERT INTO Villages VALUES (?, ?, 100, ?)",
-        (new_id, village_name, kid)
+        "INSERT INTO Villages VALUES (?, ?, 100, ?)", (new_id, village_name, kid)
     )
 
     cfg.db_conn.commit()
@@ -124,19 +137,20 @@ async def buy_village(ctx, args):
         + "` doubloons."
     )
 
+
 async def upgrade_village(ctx, args):
     pass
 
 
 async def rename_village(ctx, args):
-    
+
     cfg.db_cur.execute(
         "SELECT * FROM Villages v, Kingdoms k WHERE k.kid=v.kid AND k.uid=? ORDER BY v_name COLLATE NOCASE ASC, population DESC, vid ASC;",
-        (str(ctx.author.id),)
+        (str(ctx.author.id),),
     )
 
     results = cfg.db_cur.fetchall()
-    
+
     # If index is not valid
     if not args[1].isnumeric() or int(args[1]) < 1 or int(args[1]) > len(results):
         to_send = ">>> "
@@ -144,12 +158,12 @@ async def rename_village(ctx, args):
         await ctx.channel.send(to_send)
 
         return
-    
+
     target_village = results[int(args[1]) - 1]
-    new_name = " ".join(args[2:]).capitalize()
+    new_name = " ".join(args[2:])
 
     await ctx.channel.send(
-        ">>> Are you sure you would like to rename  '" 
+        ">>> Are you sure you would like to rename  '"
         + str(target_village["v_name"])
         + "' to '"
         + str(new_name)
@@ -170,12 +184,13 @@ async def rename_village(ctx, args):
     # Update village name in database
     cfg.db_cur.execute(
         "UPDATE Villages SET v_name=? WHERE vid=?;",
-        (new_name, str(target_village["vid"]))
+        (new_name, str(target_village["vid"])),
     )
 
     cfg.db_conn.commit()
 
     await ctx.channel.send("Village successfully renamed!")
+
 
 def calculate_village_price():
     return 0

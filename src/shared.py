@@ -7,11 +7,13 @@ def check_funds_available(ctx, price, amount):
     cfg.db_cur.execute("SELECT doubloons FROM Users WHERE uid=?;", (ctx.author.id,))
     result = cfg.db_cur.fetchone()
 
-    return result['doubloons'] >= total_price
+    return result["doubloons"] >= total_price
+
 
 def detract_funds(ctx, price):
-    cfg.db_cur.execute("UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
-        (price, str(ctx.author.id))
+    cfg.db_cur.execute(
+        "UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
+        (price, str(ctx.author.id)),
     )
 
     cfg.db_conn.commit()
