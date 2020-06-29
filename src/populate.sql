@@ -29,7 +29,6 @@ CREATE TABLE Villages (
     vid             text,
     v_name          text,
     population      int,
-    rumpus_level    int,
     kid             text NOT NULL,
     PRIMARY KEY (vid),
     FOREIGN KEY (kid) REFERENCES Kingdoms

@@ -4,6 +4,11 @@
     "root_ids": [167403984171040768],
     "attack_options": [
         {
+            "name": "Cheapus",
+            "price": 0,
+            "attack": 1
+        },
+        {
             "name": "Rumpus Warrior",
             "price": 100,
             "attack": 1

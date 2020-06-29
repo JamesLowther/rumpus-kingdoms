@@ -66,7 +66,7 @@ def unique_ID(table, column):
         if not cfg.db_cur.fetchone():
             break
 
-    return new_id
+    return str(new_id)
 
 
 # Read the configuration file

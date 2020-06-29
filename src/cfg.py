@@ -12,6 +12,9 @@ def init():
     attack_options = None
     defence_options = None
 
+    global base_village_price
+    base_village_price = None
+
     global db_conn, db_cur
     db_conn = None
     db_cur = None
