@@ -41,6 +41,8 @@ async def village_options(ctx, *args):
             )
             return
 
+        await upgrade_village(ctx, args)
+
     elif action == "rename":
         if len(args) < 3:
             await ctx.channel.send(
@@ -139,11 +141,65 @@ async def buy_village(ctx, args):
 
 
 async def upgrade_village(ctx, args):
-    pass
+    cfg.db_cur.execute(
+        "SELECT * FROM Villages v, Kingdoms k WHERE k.kid=v.kid AND k.uid=? ORDER BY v_name COLLATE NOCASE ASC, population DESC, vid ASC;",
+        (str(ctx.author.id),),
+    )
 
+    results = cfg.db_cur.fetchall()
+
+    # If index is not valid
+    if not args[1].isnumeric() or int(args[1]) < 1 or int(args[1]) > len(results):
+        to_send = ">>> "
+        to_send += "Index out of range!"
+        await ctx.channel.send(to_send)
+
+        return
+
+    target_village = results[int(args[1]) - 1]
+    upgrade_price = calculate_upgrade_price(target_village)
+    pop_increase = calculate_population_increase()
+
+    if not shared.check_funds_available(ctx, upgrade_price, 1):
+        await ctx.channel.send(
+            ">>> Sorry, you need at least `"
+            + str(upgrade_price)
+            + "` doubloons to upgrade this village. Upgrade cancelled."
+        )
+        return
+
+    await ctx.channel.send(
+        ">>> Are you sure you would like to upgrade '"
+        + str(target_village["v_name"])
+        + "' and boost its population by `"
+        + str(pop_increase)
+        + "` Rumplins for `"
+        + str(upgrade_price)
+        + "` doubloon(s)? (y/n)"
+    )
+
+    # Pre-condition check for wait_for function
+    def check(msg):
+        return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
+
+    msg = await bot.wait_for("message", check=check)
+
+    # User cancelled the kingdom creation
+    if msg.content.lower() == "n":
+        await ctx.channel.send(">>> Village upgrade cancelled!")
+        return
+
+    # Update village name in database
+    cfg.db_cur.execute(
+        "UPDATE Villages SET population=population + ? WHERE vid=?;",
+        (pop_increase, str(target_village["vid"])),
+    )
+
+    cfg.db_conn.commit()
+
+    await ctx.channel.send("Village successfully upgraded!")
 
 async def rename_village(ctx, args):
-
     cfg.db_cur.execute(
         "SELECT * FROM Villages v, Kingdoms k WHERE k.kid=v.kid AND k.uid=? ORDER BY v_name COLLATE NOCASE ASC, population DESC, vid ASC;",
         (str(ctx.author.id),),
@@ -194,3 +250,9 @@ async def rename_village(ctx, args):
 
 def calculate_village_price():
     return 0
+
+def calculate_upgrade_price(village):
+    return 0
+
+def calculate_population_increase():
+    return 1000
