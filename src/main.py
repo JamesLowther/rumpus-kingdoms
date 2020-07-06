@@ -20,7 +20,7 @@ def main():
     (bot_token, db_path) = management.read_json()
 
     connect_db(db_path)
-    
+
     cfg.scheduler = scheduled.Scheduler()
 
     cfg.bot.run(bot_token)

@@ -4,12 +4,15 @@ import time
 
 import cfg
 
+
 def reset_tax_collected_flag():
     cfg.db_cur.execute("UPDATE Users SET tax_collected=0;")
     cfg.db_con.commit()
 
+
 def test():
     print("here")
+
 
 class Scheduler:
     def __init__(self):
@@ -28,6 +31,7 @@ class Scheduler:
             schedule.run_pending()
             time.sleep(1)
 
+
 # Add scheduled events here
 schedule.every().day.at("23:59").do(reset_tax_collected_flag)
-#schedule.every(3).seconds.do(test)
+# schedule.every(3).seconds.do(test)

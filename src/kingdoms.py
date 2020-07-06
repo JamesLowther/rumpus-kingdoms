@@ -126,7 +126,9 @@ async def buy_troops(ctx, *args):
 
     # Check if index is valid
     if not (
-        index >= 0 and index <= len(cfg.config['attack_options']) + len(cfg.config['defence_options']) - 1
+        index >= 0
+        and index
+        <= len(cfg.config["attack_options"]) + len(cfg.config["defence_options"]) - 1
     ):
         await ctx.channel.send("Index out of range! Cancelling.")
         return
@@ -137,11 +139,11 @@ async def buy_troops(ctx, *args):
     else:
         amount_to_purchase = 1
 
-    number_attack_units = len(cfg.config['attack_options'])
+    number_attack_units = len(cfg.config["attack_options"])
 
     # Purchase attack unit
     if index > number_attack_units - 1:
-        to_purchase = cfg.config['defence_options'][index - number_attack_units]
+        to_purchase = cfg.config["defence_options"][index - number_attack_units]
         total_price = to_purchase["price"] * amount_to_purchase
 
         if not shared.check_funds_available(
@@ -158,7 +160,7 @@ async def buy_troops(ctx, *args):
 
     # Purchase defence unit
     else:
-        to_purchase = cfg.config['attack_options'][index]
+        to_purchase = cfg.config["attack_options"][index]
         total_price = to_purchase["price"] * amount_to_purchase
 
         if not shared.check_funds_available(
@@ -197,7 +199,7 @@ async def show_purchase_options(ctx):
         "Attack Units",
         ["Name", "Price", "Attack"],
         ["name", "price", "attack"],
-        cfg.config['attack_options'],
+        cfg.config["attack_options"],
         0,
     )
     to_send += "\n"
@@ -205,8 +207,8 @@ async def show_purchase_options(ctx):
         "Defence Units",
         ["Name", "Price", "Defence"],
         ["name", "price", "defence"],
-        cfg.config['defence_options'],
-        len(cfg.config['attack_options']),
+        cfg.config["defence_options"],
+        len(cfg.config["attack_options"]),
     )
     to_send += (
         "\nUse the command `"

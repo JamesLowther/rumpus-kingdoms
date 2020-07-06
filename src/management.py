@@ -41,7 +41,7 @@ async def reload_config(ctx):
 
 # Checks if the id is in the ROOT_IDS list
 def check_root(user_id):
-    return user_id in cfg.config['root_ids']
+    return user_id in cfg.config["root_ids"]
 
 
 # Create the user in the database

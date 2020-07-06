@@ -7,7 +7,7 @@ import cfg, kingdoms
 # Collect tax from village population
 @bot.command(name="collect")
 async def collect_tax(ctx):
-    
+
     # Check if user has a kingdom
     if not kingdoms.check_has_kingdom(ctx):
         await kingdoms.handle_no_kingdom(ctx)
@@ -22,17 +22,21 @@ async def collect_tax(ctx):
         return
 
     # Count the total population of a kingdom
-    cfg.db_cur.execute("SELECT SUM(v.population) as total_pop, COUNT(v.vid) as num_villages FROM Villages v, Kingdoms k WHERE v.kid=k.kid AND k.uid=?;", (ctx.author.id,))
+    cfg.db_cur.execute(
+        "SELECT SUM(v.population) as total_pop, COUNT(v.vid) as num_villages FROM Villages v, Kingdoms k WHERE v.kid=k.kid AND k.uid=?;",
+        (ctx.author.id,),
+    )
     result = cfg.db_cur.fetchone()
 
-    total_pop = result['total_pop']
+    total_pop = result["total_pop"]
     tax_collected = calculate_tax_amount(total_pop)
-    num_villages = result['num_villages']
+    num_villages = result["num_villages"]
 
     add_doubloons(ctx, tax_collected)
     set_tax_collected_flag(ctx, 1)
 
     await send_tax_collected_message(ctx, tax_collected, num_villages, total_pop)
+
 
 @bot.command(name="tax_rate")
 async def show_tax_rate(ctx):
@@ -50,14 +54,16 @@ def check_tax_collected_today(ctx):
     cfg.db_cur.execute("SELECT tax_collected FROM Users WHERE uid=?;", (ctx.author.id,))
     result = cfg.db_cur.fetchone()
 
-    return result['tax_collected']
+    return result["tax_collected"]
 
 
 # Sets the tax collected to a new value
 def set_tax_collected_flag(ctx, value):
-    assert(value in {0, 1})
+    assert value in {0, 1}
 
-    cfg.db_cur.execute("UPDATE Users SET tax_collected=? WHERE uid=?;", (value, ctx.author.id))
+    cfg.db_cur.execute(
+        "UPDATE Users SET tax_collected=? WHERE uid=?;", (value, ctx.author.id)
+    )
     cfg.db_con.commit()
 
 
@@ -71,7 +77,9 @@ def get_tax_rate():
 
 
 def add_doubloons(ctx, to_add):
-    cfg.db_cur.execute("UPDATE Users SET doubloons=doubloons+? WHERE uid=?;", (to_add, ctx.author.id))
+    cfg.db_cur.execute(
+        "UPDATE Users SET doubloons=doubloons+? WHERE uid=?;", (to_add, ctx.author.id)
+    )
     cfg.db_con.commit()
 
 
@@ -83,5 +91,3 @@ async def send_tax_collected_message(ctx, tax_collected, num_villages, total_pop
     to_send += "` villages! Don't forget to collect tax again tomorrow!"
 
     await ctx.channel.send(to_send)
-
-    

@@ -199,6 +199,7 @@ async def upgrade_village(ctx, args):
 
     await ctx.channel.send("Village successfully upgraded!")
 
+
 async def rename_village(ctx, args):
     cfg.db_cur.execute(
         "SELECT * FROM Villages v, Kingdoms k WHERE k.kid=v.kid AND k.uid=? ORDER BY v_name COLLATE NOCASE ASC, population DESC, vid ASC;",
@@ -251,8 +252,10 @@ async def rename_village(ctx, args):
 def calculate_village_price():
     return 0
 
+
 def calculate_upgrade_price(village):
     return 0
+
 
 def calculate_population_increase():
     return 1000
