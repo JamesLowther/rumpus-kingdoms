@@ -6,7 +6,7 @@ def init():
     bot = None
 
     global config
-    config = None
+    config = {}
 
     global scheduler
     scheduler = None
