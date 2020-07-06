@@ -43,10 +43,8 @@ def check_db_tax_variable():
     result = cfg.db_cur.fetchone()
 
     if result == None:
-        tax_rate = currency.calculate_new_tax_rate()
-
-        cfg.db_cur.execute("INSERT INTO Variables VALUES ('tax_rate', ?)", (tax_rate,))
-        cfg.db_con.commit()
+        cfg.db_cur.execute("INSERT INTO Variables VALUES ('tax_rate', 0);")
+        currency.calculate_new_tax_rate()
 
 
 @bot.event
