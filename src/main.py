@@ -13,22 +13,15 @@ cfg.init()
 bot = commands.Bot(command_prefix=cfg.PREFIX)
 cfg.bot = bot
 
-import management, kingdoms, user, villages
+import management, kingdoms, user, villages, currency, scheduled
 
 
 def main():
-    (
-        bot_token,
-        root_ids,
-        db_path,
-        attack_options,
-        defence_options,
-    ) = management.read_json()
-    cfg.root_ids = root_ids
-    cfg.attack_options = attack_options
-    cfg.defence_options = defence_options
+    (bot_token, db_path) = management.read_json()
 
     connect_db(db_path)
+    
+    cfg.scheduler = scheduled.Scheduler()
 
     cfg.bot.run(bot_token)
 
@@ -36,9 +29,9 @@ def main():
 # Connect to the sqlite3 database
 # Sets global connection objects in cfg.py
 def connect_db(db_path):
-    cfg.db_conn = sqlite3.connect(db_path)
-    cfg.db_conn.row_factory = sqlite3.Row
-    cfg.db_cur = cfg.db_conn.cursor()
+    cfg.db_con = sqlite3.connect(db_path)
+    cfg.db_con.row_factory = sqlite3.Row
+    cfg.db_cur = cfg.db_con.cursor()
 
     print("Connected to database at path: " + str(db_path))
 

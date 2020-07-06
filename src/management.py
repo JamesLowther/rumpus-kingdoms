@@ -16,7 +16,8 @@ async def shutdown(ctx):
     print(str(ctx.author.id) + " (" + str(ctx.author) + ") called for shutdown")
 
     if check_root(ctx.author.id):
-        cfg.db_conn.close()
+        cfg.db_con.close()
+        cfg.scheduler.shutdown_threads()
 
         await ctx.channel.send("The rumpus room remains unguarded. Tread carefully.")
         await bot.logout()
@@ -31,12 +32,7 @@ async def reload_config(ctx):
     print(str(ctx.author.id) + " (" + str(ctx.author) + ") called for reload")
 
     if check_root(ctx.author.id):
-        (a, root_ids, b, attack_options, defence_options) = read_json()
-
-        cfg.root_ids = root_ids
-        cfg.attack_options = attack_options
-        cfg.defence_options = defence_options
-
+        read_json()
         await ctx.channel.send("Reload successful!")
 
     else:
@@ -45,15 +41,15 @@ async def reload_config(ctx):
 
 # Checks if the id is in the ROOT_IDS list
 def check_root(user_id):
-    return user_id in cfg.root_ids
+    return user_id in cfg.config['root_ids']
 
 
 # Create the user in the database
 def create_user(ctx):
     cfg.db_cur.execute(
-        "INSERT INTO Users VALUES (?, 0, 'Serf', 0, NULL);", (str(ctx.author.id),)
+        "INSERT INTO Users VALUES (?, 0, 'Serf', 0, 0, NULL);", (str(ctx.author.id),)
     )
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
 
 # Generate a random ID for a table
@@ -76,11 +72,9 @@ def read_json():
         data = json.load(f)
 
         bot_token = data["bot_token"]
-        root_ids = data["root_ids"]
         db_path = os.path.dirname(os.path.realpath(__file__)) + "/" + data["db_name"]
-        attack_options = data["attack_options"]
-        defence_options = data["defence_options"]
+        cfg.config = data
 
         f.close()
 
-        return (bot_token, root_ids, db_path, attack_options, defence_options)
+        return (bot_token, db_path)

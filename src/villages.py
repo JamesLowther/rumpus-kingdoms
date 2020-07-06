@@ -129,7 +129,7 @@ async def buy_village(ctx, args):
         "INSERT INTO Villages VALUES (?, ?, 100, ?)", (new_id, village_name, kid)
     )
 
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
     await ctx.channel.send(
         ">>> Purchased '"
@@ -195,7 +195,7 @@ async def upgrade_village(ctx, args):
         (pop_increase, str(target_village["vid"])),
     )
 
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
     await ctx.channel.send("Village successfully upgraded!")
 
@@ -243,7 +243,7 @@ async def rename_village(ctx, args):
         (new_name, str(target_village["vid"])),
     )
 
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
     await ctx.channel.send("Village successfully renamed!")
 

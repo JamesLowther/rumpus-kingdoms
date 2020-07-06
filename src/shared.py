@@ -12,11 +12,11 @@ def check_funds_available(ctx, price, amount):
 
 def detract_funds(ctx, price):
     cfg.db_cur.execute(
-        "UPDATE Users SET doubloons=doubloons - ? WHERE uid=?",
+        "UPDATE Users SET doubloons=doubloons - ? WHERE uid=?;",
         (price, str(ctx.author.id)),
     )
 
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
 
 # Creates a table from the data in a discord markup string

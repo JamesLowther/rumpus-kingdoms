@@ -5,16 +5,12 @@ def init():
     global bot
     bot = None
 
-    global root_ids
-    root_ids = None
+    global config
+    config = None
 
-    global attack_options, defence_options
-    attack_options = None
-    defence_options = None
+    global scheduler
+    scheduler = None
 
-    global base_village_price
-    base_village_price = None
-
-    global db_conn, db_cur
-    db_conn = None
+    global db_con, db_cur
+    db_con = None
     db_cur = None

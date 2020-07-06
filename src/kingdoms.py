@@ -45,7 +45,7 @@ def create_kingdom(ctx, kingdom_name):
         "INSERT INTO Kingdoms VALUES (?, ?, 0, 0, '', ?);",
         (new_id, kingdom_name, str(ctx.author.id)),
     )
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
 
 # Called if a user does not have a kingdom but should
@@ -104,7 +104,7 @@ async def rename_kingdom(ctx, *args):
     cfg.db_cur.execute(
         "UPDATE Kingdoms SET k_name=? WHERE uid=?;", (new_name, str(ctx.author.id))
     )
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
     await ctx.channel.send("Kingdom renamed to '" + new_name + "'.")
 
@@ -126,7 +126,7 @@ async def buy_troops(ctx, *args):
 
     # Check if index is valid
     if not (
-        index >= 0 and index <= len(cfg.attack_options) + len(cfg.defence_options) - 1
+        index >= 0 and index <= len(cfg.config['attack_options']) + len(cfg.config['defence_options']) - 1
     ):
         await ctx.channel.send("Index out of range! Cancelling.")
         return
@@ -137,11 +137,11 @@ async def buy_troops(ctx, *args):
     else:
         amount_to_purchase = 1
 
-    number_attack_units = len(cfg.attack_options)
+    number_attack_units = len(cfg.config['attack_options'])
 
     # Purchase attack unit
     if index > number_attack_units - 1:
-        to_purchase = cfg.defence_options[index - number_attack_units]
+        to_purchase = cfg.config['defence_options'][index - number_attack_units]
         total_price = to_purchase["price"] * amount_to_purchase
 
         if not shared.check_funds_available(
@@ -158,7 +158,7 @@ async def buy_troops(ctx, *args):
 
     # Purchase defence unit
     else:
-        to_purchase = cfg.attack_options[index]
+        to_purchase = cfg.config['attack_options'][index]
         total_price = to_purchase["price"] * amount_to_purchase
 
         if not shared.check_funds_available(
@@ -197,7 +197,7 @@ async def show_purchase_options(ctx):
         "Attack Units",
         ["Name", "Price", "Attack"],
         ["name", "price", "attack"],
-        cfg.attack_options,
+        cfg.config['attack_options'],
         0,
     )
     to_send += "\n"
@@ -205,8 +205,8 @@ async def show_purchase_options(ctx):
         "Defence Units",
         ["Name", "Price", "Defence"],
         ["name", "price", "defence"],
-        cfg.defence_options,
-        len(cfg.attack_options),
+        cfg.config['defence_options'],
+        len(cfg.config['attack_options']),
     )
     to_send += (
         "\nUse the command `"
@@ -254,7 +254,7 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
         (to_purchase["attack"] * amount, str(ctx.author.id)),
     )
 
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
     return to_purchase
 
@@ -294,6 +294,6 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
         (to_purchase["defence"] * amount, str(ctx.author.id)),
     )
 
-    cfg.db_conn.commit()
+    cfg.db_con.commit()
 
     return to_purchase

@@ -9,6 +9,7 @@ CREATE TABLE Users (
     doubloons       int,
     rank            text,
     block           int,
+    tax_collected   int,
     kid             text,
     PRIMARY KEY (uid),
     FOREIGN KEY (kid) REFERENCES Kingdoms
