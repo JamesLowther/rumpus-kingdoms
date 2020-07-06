@@ -20,6 +20,7 @@ def main():
     (bot_token, db_path) = management.read_json()
 
     connect_db(db_path)
+    check_db_tax_variable()
 
     cfg.scheduler = scheduled.Scheduler()
 
@@ -34,6 +35,18 @@ def connect_db(db_path):
     cfg.db_cur = cfg.db_con.cursor()
 
     print("Connected to database at path: " + str(db_path))
+
+
+# Check if tax_rate variable is set
+def check_db_tax_variable():
+    cfg.db_cur.execute("SELECT * FROM Variables WHERE name='tax_rate';")
+    result = cfg.db_cur.fetchone()
+
+    if result == None:
+        tax_rate = currency.calculate_new_tax_rate()
+
+        cfg.db_cur.execute("INSERT INTO Variables VALUES ('tax_rate', ?)", (tax_rate,))
+        cfg.db_con.commit()
 
 
 @bot.event

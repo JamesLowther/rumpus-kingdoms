@@ -1,13 +1,13 @@
 from discord.ext import commands
 from cfg import bot
 
+from random import uniform, choice
 import cfg, kingdoms
 
 
 # Collect tax from village population
 @bot.command(name="collect")
 async def collect_tax(ctx):
-
     # Check if user has a kingdom
     if not kingdoms.check_has_kingdom(ctx):
         await kingdoms.handle_no_kingdom(ctx)
@@ -72,10 +72,40 @@ def calculate_tax_amount(total_pop):
     return int(total_pop * get_tax_rate())
 
 
+# Get the tax rate from the database
 def get_tax_rate():
-    return 0.5
+    cfg.db_cur.execute("SELECT value FROM Variables WHERE name='tax_rate';")
+    result = cfg.db_cur.fetchone()
+
+    return result["value"]
 
 
+# Calculate the new tax rate
+# Commit new rate to database
+def calculate_new_tax_rate():
+    tax_base = cfg.config["tax_base"]
+    tax_change = cfg.config["tax_change"]
+
+    # Calculate change (+/-)
+    random_change = round(uniform(0, tax_change), 2)
+    random_change *= choice([-1, 1])
+
+    new_tax_rate = tax_base + random_change
+
+    # Commit to database
+    cfg.db_cur.execute(
+        "UPDATE Variables SET value=? WHERE name='tax_rate';", (new_tax_rate,)
+    )
+    cfg.db_con.commit()
+
+
+# Reset the tax_collected flag for all users
+def reset_tax_collected_flag():
+    cfg.db_cur.execute("UPDATE Users SET tax_collected=0;")
+    cfg.db_con.commit()
+
+
+# Add doubloons to a user's balance
 def add_doubloons(ctx, to_add):
     cfg.db_cur.execute(
         "UPDATE Users SET doubloons=doubloons+? WHERE uid=?;", (to_add, ctx.author.id)
@@ -83,6 +113,7 @@ def add_doubloons(ctx, to_add):
     cfg.db_con.commit()
 
 
+# Send the message about how much tax is collected
 async def send_tax_collected_message(ctx, tax_collected, num_villages, total_pop):
     to_send = ">>> "
     to_send += "You collected `" + str(tax_collected)

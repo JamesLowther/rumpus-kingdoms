@@ -34,3 +34,9 @@ CREATE TABLE Villages (
     PRIMARY KEY (vid),
     FOREIGN KEY (kid) REFERENCES Kingdoms
 );
+
+CREATE TABLE Variables (
+    name            text,
+    value           real,
+    PRIMARY KEY (name)
+);
