@@ -40,3 +40,6 @@ CREATE TABLE Variables (
     value           real,
     PRIMARY KEY (name)
 );
+
+INSERT INTO Variables VALUES
+    ('tax_rate', 0);
