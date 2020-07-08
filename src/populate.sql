@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Kingdoms;
 DROP TABLE IF EXISTS Villages;
+DROP TABLE IF EXISTS Variables;
 
 PRAGMA foreign_keys = ON;
 

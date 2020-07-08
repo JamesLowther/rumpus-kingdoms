@@ -24,7 +24,7 @@ async def collect_tax(ctx):
     # Count the total population of a kingdom
     cfg.db_cur.execute(
         "SELECT SUM(v.population) as total_pop, COUNT(v.vid) as num_villages FROM Villages v, Kingdoms k WHERE v.kid=k.kid AND k.uid=?;",
-        (ctx.author.id,),
+        (str(ctx.author.id),),
     )
     result = cfg.db_cur.fetchone()
 

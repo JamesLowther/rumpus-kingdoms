@@ -1,3 +1,5 @@
+from cfg import bot
+
 import cfg
 
 # Check if a user can afford a certain price
@@ -21,7 +23,7 @@ def detract_funds(ctx, price):
 
 # Creates a table from the data in a discord markup string
 # headers and key lists must be the same length
-def create_table(category, headers, keys, data, offset):
+def create_table(category, headers, keys, data, offset, index=True):
     assert len(headers) == len(keys)
 
     # Category
@@ -39,7 +41,10 @@ def create_table(category, headers, keys, data, offset):
     to_send += "```"
 
     # Headers
-    headers_to_send = "Index | "
+    if index:
+        headers_to_send = "Index | "
+    else:
+        headers_to_send = ""
 
     for i in range(len(headers)):
         headers_to_send += str(headers[i]).ljust(header_size[i])
@@ -52,7 +57,8 @@ def create_table(category, headers, keys, data, offset):
 
     # Data
     for i in range(len(data)):
-        to_send += f"{i+1+offset:02d}".ljust(5) + " | "
+        if index:
+            to_send += f"{i+1+offset:02d}".ljust(5) + " | "
         for j in range(len(keys)):
             to_send += str(data[i][keys[j]]).ljust(header_size[j])
             to_send += " | "
@@ -61,3 +67,25 @@ def create_table(category, headers, keys, data, offset):
     to_send += "```"
 
     return to_send
+
+
+# Takes ids from a query and turns the id into a name
+# Returns a list of dicts similar to a sqlite row object
+def convert_id_to_name(data, key_to_change):
+    new_list = []
+    
+    for row in data:
+        new_dict = dict(row)
+
+        user = bot.get_user(int(row[key_to_change])+12)
+
+        # Check if user was found
+        if user:
+            username = user.name
+        else:
+            username = "Username not found"
+
+        new_dict[key_to_change] = username
+        new_list.append(new_dict)
+
+    return new_list
