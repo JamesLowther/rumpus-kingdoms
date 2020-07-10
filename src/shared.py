@@ -73,7 +73,7 @@ def create_table(category, headers, keys, data, offset, index=True):
 # Returns a list of dicts similar to a sqlite row object
 def convert_id_to_name_key(data, key_to_change, new_key):
     new_list = []
-    
+
     for row in data:
         new_dict = dict(row)
 

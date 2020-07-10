@@ -19,7 +19,9 @@ async def init_kingdom(ctx, *args):
     kingdom_name = " ".join(args[0:])
 
     await ctx.channel.send(
-        "Are you sure you would like to name your kingdom **" + kingdom_name + "**? (y/n)"
+        "Are you sure you would like to name your kingdom **"
+        + kingdom_name
+        + "**? (y/n)"
     )
 
     # Pre-condition check for wait_for function
