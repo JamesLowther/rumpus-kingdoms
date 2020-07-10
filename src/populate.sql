@@ -22,6 +22,8 @@ CREATE TABLE Kingdoms (
     attack          int,
     defence         int,
     warcry          text,
+    been_attacked   int,
+    has_attacked    int,
     uid             text NOT NULL,
     PRIMARY KEY (kid),
     FOREIGN KEY (uid) REFERENCES Users ON DELETE NO ACTION

@@ -20,3 +20,20 @@ Doubloons are taken from tax, RUMPUS RUNS (time when praising is accepted), and 
 A leaderboard will exist for the kingdom with the most amount of rumpus land
 
 Users can dig for up to 3 rumpus relics per day.
+
+# Warfare
+
+User1 picks User2 to attack
+User1 does not know the attack or defence of User2
+User1 picks the amount of attack units to send
+If User1 sends more attack units than User2 has for defence then User1 wins
+If User1 does not have more attack units then User2 has for defence then User2 wins
+The attacking User1 always loses all sent attack units
+The defending User2 loses defence units only if they successfully attack
+User1 can only attack once per day
+User2 can only be attacked once per day
+
+If User1 wins, they get User2's lowest population village
+If User2 successfully defends, User2 gets User1's lowest population village
+
+167403984171040768

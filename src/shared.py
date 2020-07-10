@@ -71,13 +71,13 @@ def create_table(category, headers, keys, data, offset, index=True):
 
 # Takes ids from a query and turns the id into a name
 # Returns a list of dicts similar to a sqlite row object
-def convert_id_to_name(data, key_to_change):
+def convert_id_to_name_key(data, key_to_change, new_key):
     new_list = []
     
     for row in data:
         new_dict = dict(row)
 
-        user = bot.get_user(int(row[key_to_change])+12)
+        user = bot.get_user(int(row[key_to_change]))
 
         # Check if user was found
         if user:
@@ -85,7 +85,7 @@ def convert_id_to_name(data, key_to_change):
         else:
             username = "Username not found"
 
-        new_dict[key_to_change] = username
+        new_dict[new_key] = username
         new_list.append(new_dict)
 
     return new_list

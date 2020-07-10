@@ -91,9 +91,9 @@ async def buy_village(ctx, args):
         return
 
     await ctx.channel.send(
-        ">>> Are you sure you would like to buy the village called '"
+        ">>> Are you sure you would like to buy the village called **"
         + village_name
-        + "' for `"
+        + "** for `"
         + str(village_price)
         + "` doubloons? (y/n)"
     )
@@ -169,9 +169,9 @@ async def upgrade_village(ctx, args):
         return
 
     await ctx.channel.send(
-        ">>> Are you sure you would like to upgrade '"
+        ">>> Are you sure you would like to upgrade **"
         + str(target_village["v_name"])
-        + "' and boost its population by `"
+        + "** and boost its population by `"
         + str(pop_increase)
         + "` Rumplins for `"
         + str(upgrade_price)
@@ -220,11 +220,11 @@ async def rename_village(ctx, args):
     new_name = " ".join(args[2:])
 
     await ctx.channel.send(
-        ">>> Are you sure you would like to rename  '"
+        ">>> Are you sure you would like to rename **"
         + str(target_village["v_name"])
-        + "' to '"
+        + "** to **"
         + str(new_name)
-        + "'? (y/n)"
+        + "**? (y/n)"
     )
 
     # Pre-condition check for wait_for function

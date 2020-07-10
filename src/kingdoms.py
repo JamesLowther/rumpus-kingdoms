@@ -19,7 +19,7 @@ async def init_kingdom(ctx, *args):
     kingdom_name = " ".join(args[0:])
 
     await ctx.channel.send(
-        "Are you sure you would like to name your kingdom '" + kingdom_name + "'? (y/n)"
+        "Are you sure you would like to name your kingdom **" + kingdom_name + "**? (y/n)"
     )
 
     # Pre-condition check for wait_for function
@@ -42,7 +42,7 @@ async def init_kingdom(ctx, *args):
 def create_kingdom(ctx, kingdom_name):
     new_id = management.unique_ID("Kingdoms", "kid")
     cfg.db_cur.execute(
-        "INSERT INTO Kingdoms VALUES (?, ?, 0, 0, '', ?);",
+        "INSERT INTO Kingdoms VALUES (?, ?, 0, 0, '', 0, 0, ?);",
         (new_id, kingdom_name, str(ctx.author.id)),
     )
     cfg.db_con.commit()
@@ -87,7 +87,7 @@ async def rename_kingdom(ctx, *args):
     new_name = args[0]
 
     await ctx.channel.send(
-        "Are you sure you would like to name your kingdom '" + new_name + "'? (y/n)"
+        "Are you sure you would like to name your kingdom **" + new_name + "**? (y/n)"
     )
 
     # Pre-condition check for wait_for function
@@ -231,9 +231,9 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
     await ctx.channel.send(
         ">>> Are you sure you would like to purchase "
         + str(amount)
-        + " '"
+        + " **"
         + str(to_purchase["name"])
-        + "' for `"
+        + "** for `"
         + str(total_price)
         + str("` doubloon(s)? (y/n)")
     )
@@ -273,9 +273,9 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
     await ctx.channel.send(
         ">>> Are you sure you would like to purchase "
         + str(amount)
-        + " '"
+        + " **"
         + str(to_purchase["name"])
-        + "' for `"
+        + "** for `"
         + str(total_price)
         + str("` doubloon(s)? (y/n)")
     )
