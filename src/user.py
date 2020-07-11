@@ -23,6 +23,10 @@ def get_general_help_string():
         cfg.PREFIX
         + "info                           :  Show your current player/kingdom information\n"
     )
+    to_send += (
+        cfg.PREFIX
+        + "levelup                        :  Level up to the next rank\n"
+    )
     to_send += cfg.PREFIX + "players                        :  List all players\n"
     to_send += (
         cfg.PREFIX
@@ -41,15 +45,16 @@ def get_general_help_string():
 async def display_user_info(ctx):
 
     cfg.db_cur.execute(
-        "SELECT k.k_name, k.attack, k.defence, u.doubloons, u.rank FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
+        "SELECT k.k_name, k.attack, k.defence, u.doubloons, u.rank, u.rumpus_count FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
         (str(ctx.author.id),),
     )
 
     result = cfg.db_cur.fetchone()
 
     if result:
-        to_send = ">>> **" + str(ctx.author) + " of " + str(result["k_name"]) + "**\n\n"
-        to_send += "**Rank:** `" + str(result["rank"]) + "`\n"
+        to_send = ">>> **" + str(ctx.author) + "** of **" + str(result["k_name"]) + "**\n\n"
+        to_send += "**Rank:** `" + str(cfg.config['ranks'][result["rank"]]['name']) + "`\n"
+        to_send += "**Rumpuses:** `" + str(result["rumpus_count"]) + "`\n"
         to_send += "**Doubloons:** `" + str(result["doubloons"]) + "`\n"
         to_send += "**Attack:** `" + str(result["attack"]) + "`\n"
         to_send += "**Defence:** `" + str(result["defence"]) + "`\n"

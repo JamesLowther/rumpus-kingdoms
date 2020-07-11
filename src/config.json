@@ -9,6 +9,7 @@
     "collect_timeout": 120,
     "attack_timeout": 10,
     "attacked_timeout": 30,
+
     "attack_options": [
         {
             "name": "Cheapus",
@@ -41,6 +42,67 @@
             "name": "Rumpus Vanguard",
             "price": 300,
             "defence": 2
+        }
+    ],
+    "ranks": [
+        {
+            "rank": 0,
+            "name": "Peasant",
+            "count": 0,
+            "modifier": 1
+        },
+        {
+            "rank": 1,
+            "name": "Serf",
+            "count": 500,
+            "modifier": 0.98
+        },
+        {
+            "rank": 2,
+            "name": "Farmer",
+            "count": 1000,
+            "modifier": 0.96
+        },
+        {
+            "rank": 3,
+            "name": "Merchant",
+            "count": 1500,
+            "modifier": 0.96
+        },
+        {
+            "rank": 4,
+            "name": "Craftsmen",
+            "modifier": 0.96
+        },
+        {
+            "rank": 5,
+            "name": "Knight",
+            "count": 2000,
+            "modifier": 0.96
+        },
+        {
+            "rank": 6,
+            "name": "Nobel",
+            "count": 2500,
+            "modifier": 0.96
+        },
+        {
+            "rank": 7,
+            "name": "Lord",
+            "count": 3000,
+            "modifier": 0.96
+        },
+        {
+            "rank": 8,
+            "name": "Prince",
+            "count": 3500,
+            "modifier": 0.96
+        },
+        {
+            "rank": 9,
+            "name": "King",
+            "count": 4000,
+            "modifier": 0.96
         }
     ]
 }

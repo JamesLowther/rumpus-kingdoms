@@ -10,6 +10,10 @@ import cfg, shared, kingdoms
 async def list_players(ctx):
     all_kingdoms = get_all_kingdoms()
 
+    if len(all_kingdoms) == 0:
+        await ctx.channel.send(">>> There are currently no players!")
+        return
+
     converted_all_kingdoms = shared.convert_id_to_name_key(
         all_kingdoms, "uid", "username"
     )
@@ -22,7 +26,6 @@ async def list_players(ctx):
         0,
         False,
     )
-
     await ctx.channel.send(">>> " + kingdom_table)
 
 

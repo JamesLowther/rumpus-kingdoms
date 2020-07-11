@@ -117,12 +117,6 @@ def calculate_new_tax_rate():
     cfg.db_con.commit()
 
 
-# Reset the tax_collected flag for all users
-def reset_tax_collected_flag():
-    cfg.db_cur.execute("UPDATE Users SET tax_collected=0;")
-    cfg.db_con.commit()
-
-
 # Add doubloons to a user's balance
 def add_doubloons(ctx, to_add):
     cfg.db_cur.execute(

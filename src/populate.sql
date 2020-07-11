@@ -8,7 +8,8 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE Users (
     uid             text,
     doubloons       int,
-    rank            text,
+    rank            int,
+    rumpus_count    int,
     block           int,
     tax_collected   int,
     kid             text,

@@ -14,7 +14,7 @@ bot = commands.Bot(command_prefix=cfg.PREFIX)
 bot.remove_command("help")
 cfg.bot = bot
 
-import management, kingdoms, user, villages, currency, scheduled, warfare
+import management, kingdoms, user, villages, currency, scheduled, warfare, rank
 
 
 def main():
@@ -59,8 +59,8 @@ async def on_message(ctx):
             await bot.process_commands(ctx)
 
     else:
-        pass
         # Add here to add custom chatting functionality
+        rank.check_message(ctx)
 
 
 # Checks to see if the user is in the database
