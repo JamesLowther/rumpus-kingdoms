@@ -122,3 +122,11 @@ async def send_tax_collected_message(ctx, tax_collected, num_villages, total_pop
     to_send += "` villages! Don't forget to collect tax again tomorrow!"
 
     await ctx.channel.send(to_send)
+
+
+def get_tax_help_string():
+    to_send = "**Taxation Commands** ```"
+    to_send += cfg.PREFIX + "tax_rate                       :  Show the current tax rate\n"
+    to_send += cfg.PREFIX + "collect                        :  Collect taxes from your kingdom```"
+
+    return to_send

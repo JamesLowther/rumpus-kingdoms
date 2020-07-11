@@ -1,6 +1,26 @@
 from discord.ext import commands
 from cfg import bot
-import cfg, kingdoms
+import cfg, kingdoms, villages, currency
+
+@bot.command(name="help")
+async def show_help(ctx):
+    to_send = ">>> "
+    to_send += get_general_help_string()
+    to_send += kingdoms.get_shop_help_string()
+    to_send += villages.get_village_help_string()
+    to_send += currency.get_tax_help_string()
+
+    await ctx.channel.send(to_send)
+
+def get_general_help_string():
+    to_send = "**General Commands** ```"
+    to_send += cfg.PREFIX + "help                           :  Show available all available\n"
+    to_send += cfg.PREFIX + "info                           :  Show your current player/kingdom information\n"
+    to_send += cfg.PREFIX + "players                        :  List all players\n"
+    to_send += cfg.PREFIX + "init <kingdom_name>            :  Create your kingdom called <kingdom_name>\n"
+    to_send += cfg.PREFIX + "rename_kingdom <name>          :  Rename your kingdom to <name>```"
+
+    return to_send
 
 # Displays the number of doubloons that you have
 @bot.command(name="info")

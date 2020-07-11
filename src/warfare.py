@@ -36,10 +36,13 @@ def get_all_kingdoms():
 
 # Returns all kingdoms
 # uid, k_name, number of villages
-def get_all_non_attacked_kingdoms():
-    # cfg.db_cur.execute("SELECT k.uid, k.k_name, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid;")
+def get_all_non_attacked_kingdoms(ctx):
+    #cfg.db_cur.execute(
+    #    "SELECT *, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid WHERE k.been_attacked != 1 AND k.uid != ?;",
+    #    (str(ctx.author.id),)
+    #)
     cfg.db_cur.execute(
-        "SELECT *, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid WHERE k.been_attacked != 1;"
+        "SELECT *, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid WHERE k.been_attacked != 1;",
     )
     return cfg.db_cur.fetchall()
 
@@ -55,20 +58,28 @@ async def attack_user(ctx):
     if not await check_attack_prereqs(ctx):
         return
 
-    all_kingdoms = get_all_non_attacked_kingdoms()
+    all_kingdoms = get_all_non_attacked_kingdoms(ctx)
     converted_all_kingdoms = shared.convert_id_to_name_key(
         all_kingdoms, "uid", "username"
     )
 
-    kingdom = await choose_kingdom_to_attack(ctx, converted_all_kingdoms)
-    if not kingdom:
+    attacked_kingdom = await choose_kingdom_to_attack(ctx, converted_all_kingdoms)
+    if not attacked_kingdom:
         return
 
     number_attack_units = await choose_number_attack_units(ctx)
     if not number_attack_units:
         return
 
-    print(dict(kingdom))
+    attacked_kingdom_units = get_number_units(str(attacked_kingdom['uid']))
+
+    if number_attack_units > attacked_kingdom_units['defence']:
+        await handle_successful_attack(ctx, attacked_kingdom, number_attack_units)
+
+    else:
+        await handle_failed_attack(ctx, attacked_kingdom, number_attack_units)
+
+    print(dict(attacked_kingdom))
     print(number_attack_units)
 
 
@@ -79,7 +90,7 @@ async def check_attack_prereqs(ctx):
         )
         return False
 
-    if not get_number_units(ctx)["attack"] > 0:
+    if not get_number_units(str(ctx.author.id))["attack"] > 0:
         await ctx.channel.send(
             "You need to have at least 1 attack unit to attack another user!"
         )
@@ -94,10 +105,10 @@ async def check_attack_prereqs(ctx):
     return True
 
 
-def get_number_units(ctx):
+def get_number_units(uid):
     cfg.db_cur.execute(
         "SELECT k.attack, k.defence FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
-        (str(ctx.author.id),),
+        (uid,),
     )
     return cfg.db_cur.fetchone()
 
@@ -154,8 +165,7 @@ async def choose_kingdom_to_attack(ctx, all_kingdoms):
 
 
 async def choose_number_attack_units(ctx):
-
-    number_units = get_number_units(ctx)
+    number_units = get_number_units(str(ctx.author.id))
 
     to_send = ">>> "
     to_send += "Please enter the number of attack units to send or type 'cancel' to stop the attack.\n\nYou have `"
@@ -183,3 +193,72 @@ async def choose_number_attack_units(ctx):
         return False
 
     return number_select
+
+
+async def handle_successful_attack(ctx, attacked_kingdom, number_attack_units):
+    remove_attack_units(str(ctx.author.id), number_attack_units)                    # Remove all attack units from attacker
+    remove_defence_units(str(attacked_kingdom['uid']), number_attack_units // 2)    # Remove half defence units from defender
+
+    user_kid = get_kid_from_uid(str(ctx.author.id))
+    transferred_village = transfer_lowest_pop_village(attacked_kingdom['kid'], user_kid)
+
+    to_send = ">>> "
+    to_send += "Your attack against **"
+    to_send += str(attacked_kingdom['k_name'])
+    to_send += "** was successful! You lost `"
+    to_send += str(number_attack_units)
+    to_send += "` attack unit(s) in the battle!"
+    to_send += "\nYou captured the village of **"
+    to_send += str(transferred_village['v_name'])
+    to_send += "** which has a population of `"
+    to_send += str(transferred_village['population'])
+    to_send += "`!\n\nYou must wait until tomorrow before you can attack again."
+
+    await ctx.channel.send(to_send)
+
+async def handle_failed_attack(ctx, attacked_kingdom, number_attack_units):
+    remove_attack_units(str(ctx.author.id), number_attack_units)                    # Remove all attack units from attacker
+    remove_defence_units(str(attacked_kingdom['uid']), number_attack_units)         # Remove all defence units from defender
+
+    user_kid = get_kid_from_uid(str(ctx.author.id))
+    transferred_village = transfer_lowest_pop_village(user_kid, attacked_kingdom['kid'])
+
+    to_send = ">>> "
+    to_send += "Your attack against **"
+    to_send += str(attacked_kingdom['k_name'])
+    to_send += "** failed! You lost `"
+    to_send += str(number_attack_units)
+    to_send += "` attack unit(s) in the battle!"
+    to_send += "\nYou lost the village of **"
+    to_send += str(transferred_village['v_name'])
+    to_send += "** which had a population of `"
+    to_send += str(transferred_village['population'])
+    to_send += "`!\n\nYou must wait until tomorrow before you can attack again."
+
+    await ctx.channel.send(to_send)
+
+def remove_attack_units(uid, to_remove):
+    cfg.db_cur.execute("UPDATE Kingdoms SET attack=attack-? WHERE uid=?;", (to_remove, uid))
+    cfg.db_con.commit()
+
+
+def remove_defence_units(uid, to_remove):
+    cfg.db_cur.execute("UPDATE Kingdoms SET defence=defence-? WHERE uid=?;", (to_remove, uid))
+    cfg.db_con.commit()
+
+
+def get_kid_from_uid(uid):
+    cfg.db_cur.execute("SELECT kid FROM Kingdoms WHERE uid=?;", (uid,))
+    result = cfg.db_cur.fetchone()
+    return result['kid']
+
+
+def transfer_lowest_pop_village(from_kid, to_kid):
+    # Get vid of lowest village
+    cfg.db_cur.execute("SELECT * FROM Villages WHERE kid=? ORDER BY population ASC LIMIT 1;", (from_kid,))
+    lowest_village = cfg.db_cur.fetchone()
+
+    cfg.db_cur.execute("UPDATE Villages SET kid=? WHERE vid=?;", (to_kid, lowest_village['vid']))
+    cfg.db_con.commit()
+
+    return lowest_village

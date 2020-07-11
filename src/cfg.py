@@ -1,6 +1,6 @@
 def init():
     global PREFIX
-    PREFIX = "$r "
+    PREFIX = "$"
 
     global bot
     bot = None

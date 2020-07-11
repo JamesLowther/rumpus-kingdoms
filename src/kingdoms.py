@@ -71,7 +71,7 @@ def check_has_kingdom(ctx):
 
 
 # Rename your kingdom
-@bot.command(name="rename")
+@bot.command(name="rename_kingdom")
 async def rename_kingdom(ctx, *args):
     # User doesn't have a kingdom
     if not check_has_kingdom(ctx):
@@ -112,7 +112,7 @@ async def rename_kingdom(ctx, *args):
 
 
 # Command to purchase new units
-@bot.command(name="purchase")
+@bot.command(name="shop")
 async def buy_troops(ctx, *args):
     # User doesn't have a kingdom
     if not check_has_kingdom(ctx):
@@ -120,10 +120,33 @@ async def buy_troops(ctx, *args):
         return
 
     # Show purchase options
-    if len(args) == 0 or not args[0].isnumeric():
+    if len(args) == 0:
+        await show_shop_help(ctx)
+        return
+
+    action = args[0].lower()
+
+    if action == "list":
         await show_purchase_options(ctx)
         return
 
+    elif action == "buy":
+        if len(args) < 2:
+            await ctx.channel.send(
+                ">>> Use the command `"
+                + cfg.PREFIX
+                + "shop buy <index> [amount]` to purchase a new unit."
+            )
+            return
+
+        await purchase_unit(ctx, args)
+
+    else:
+        await show_shop_help(ctx)
+        return
+
+
+async def purchase_unit(ctx, args):
     index = int(args[0]) - 1
 
     # Check if index is valid
@@ -191,7 +214,6 @@ async def buy_troops(ctx, *args):
         + "` doubloons."
     )
 
-
 # Displays all purchasable units
 # todo: this code is messy
 async def show_purchase_options(ctx):
@@ -215,7 +237,7 @@ async def show_purchase_options(ctx):
     to_send += (
         "\nUse the command `"
         + cfg.PREFIX
-        + "purchase <index> [amount]` to purchase units."
+        + "shop <index> [amount]` to purchase units."
     )
 
     await ctx.channel.send(to_send)
@@ -301,3 +323,16 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
     cfg.db_con.commit()
 
     return to_purchase
+
+
+async def show_shop_help(ctx):
+    await ctx.channel.send(">>> " + get_shop_help_string())
+
+
+def get_shop_help_string():
+    to_send = "**Shop Commands** \n```"
+    to_send += cfg.PREFIX + "shop help                      :  Show available shop commands\n"
+    to_send += cfg.PREFIX + "shop list                      :  List all of the units available to purchase\n"
+    to_send += cfg.PREFIX + "shop buy <index> [amout]       :  Buy [amount] number of units at <index>```"
+
+    return to_send

@@ -29,7 +29,8 @@ User1 picks the amount of attack units to send
 If User1 sends more attack units than User2 has for defence then User1 wins
 If User1 does not have more attack units then User2 has for defence then User2 wins
 The attacking User1 always loses all sent attack units
-The defending User2 loses defence units only if they successfully attack
+The defending User2 loses defence units only if they successfully defend
+If User2 fails to defend they lose half the number of attacking units in defence
 User1 can only attack once per day
 User2 can only be attacked once per day
 

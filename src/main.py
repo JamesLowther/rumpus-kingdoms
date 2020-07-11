@@ -11,6 +11,7 @@ cfg.init()
 # Configure and create the bot
 # The bot is being stored as a builtin
 bot = commands.Bot(command_prefix=cfg.PREFIX)
+bot.remove_command('help')
 cfg.bot = bot
 
 import management, kingdoms, user, villages, currency, scheduled, warfare

@@ -6,14 +6,20 @@ $r reload
 $r help (not done)
 $r info
 $r init <kingdom_name>
-$r purchase <index> [amount]
+$r rename_kingdom <new name>
 
-$r village <action> <index>
-    $r village help                     # list all village commands
-    $r village buy <name>               # buy a new village
-    $r village list                     # list all of your villages
-    $r village upgrade <index>          # upgrade a village
-    $r village rename <index> <name>    # rename one of your villages
-    
+# Shopping
+$r shop help
+$r shop list
+$r shop <index> [amount]
+
+# Village management
+$r village help                     # list all village commands
+$r village list                     # list all of your villages
+$r village buy <name>               # buy a new village
+$r village upgrade <index>          # upgrade a village
+$r village rename <index> <name>    # rename one of your villages
+
+# Taxation
 $r tax_rate             # see the current tax rate
 $r collect              # collect kingdom taxes

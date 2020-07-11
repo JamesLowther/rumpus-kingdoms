@@ -47,7 +47,7 @@ def check_root(user_id):
 # Create the user in the database
 def create_user(ctx):
     cfg.db_cur.execute(
-        "INSERT INTO Users VALUES (?, 0, 'Serf', 0, 0, NULL);", (str(ctx.author.id),)
+        "INSERT INTO Users VALUES (?, ?, 'Serf', 0, 0, NULL);", (str(ctx.author.id), cfg.config['starter_balance'])
     )
     cfg.db_con.commit()
 
