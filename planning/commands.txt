@@ -3,23 +3,24 @@ $r shutdown
 $r reload
 
 # Everyone
-$r help (not done)
-$r info
-$r init <kingdom_name>
-$r rename_kingdom <new name>
+$r help                             (DM)
+$r info                             (DM)
+$r players                          (public)
+$r init <kingdom_name>              (public)
+$r rename_kingdom <new name>        (public)
 
 # Shopping
-$r shop help
-$r shop list
-$r shop <index> [amount]
+$r shop help                        (DM)
+$r shop list                        (DM)
+$r shop <index> [amount]            (DM)
 
 # Village management
-$r village help                     # list all village commands
-$r village list                     # list all of your villages
-$r village buy <name>               # buy a new village
-$r village upgrade <index>          # upgrade a village
-$r village rename <index> <name>    # rename one of your villages
+$r village help                     (DM)
+$r village list                     (DM)
+$r village buy <name>               (DM)
+$r village upgrade <index>          (DM)
+$r village rename <index> <name>    (public)
 
 # Taxation
-$r tax_rate             # see the current tax rate
-$r collect              # collect kingdom taxes
+$r tax_rate                         (public)
+$r collect                          (DM)

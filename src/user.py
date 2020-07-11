@@ -11,7 +11,7 @@ async def show_help(ctx):
     to_send += villages.get_village_help_string()
     to_send += currency.get_tax_help_string()
 
-    await ctx.channel.send(to_send)
+    await ctx.author.send(to_send)
 
 
 def get_general_help_string():
@@ -54,7 +54,7 @@ async def display_user_info(ctx):
         to_send += "**Attack:** `" + str(result["attack"]) + "`\n"
         to_send += "**Defence:** `" + str(result["defence"]) + "`\n"
 
-        await ctx.channel.send(to_send)
+        await ctx.author.send(to_send)
 
     else:
         await kingdoms.handle_no_kingdom(ctx)

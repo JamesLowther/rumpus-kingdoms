@@ -1,5 +1,6 @@
 from discord.ext import commands
 from cfg import bot
+import asyncio
 import cfg, management, shared
 
 
@@ -19,7 +20,7 @@ async def init_kingdom(ctx, *args):
     kingdom_name = " ".join(args[0:])
 
     await ctx.channel.send(
-        "Are you sure you would like to name your kingdom **"
+        ">>> Are you sure you would like to name your kingdom **"
         + kingdom_name
         + "**? (y/n)"
     )
@@ -28,16 +29,21 @@ async def init_kingdom(ctx, *args):
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    msg = await bot.wait_for("message", check=check)
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+    
+    except asyncio.TimeoutError:
+        await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        return
 
     # User cancelled the kingdom creation
     if msg.content.lower() == "n":
-        await ctx.channel.send("Kingdom creation cancelled!")
+        await ctx.channel.send(">>> Kingdom creation cancelled!")
         return
 
     create_kingdom(ctx, kingdom_name)
 
-    await ctx.channel.send("Kingdom '" + kingdom_name + "' created!")
+    await ctx.channel.send(">>> Kingdom '" + kingdom_name + "' created!")
 
 
 # Insert the kingdom into the database
@@ -61,7 +67,7 @@ async def handle_no_kingdom(ctx):
 
 # Called if a user already has a kingdom but shouldn't
 async def handle_existing_kingdom(ctx):
-    await ctx.channel.send("You already have a kingdom " + str(ctx.author) + "!")
+    await ctx.channel.send(">>> You already have a kingdom " + str(ctx.author) + "!")
 
 
 # Return if a user already has a kingdom
@@ -80,7 +86,7 @@ async def rename_kingdom(ctx, *args):
 
     if len(args) == 0:
         await ctx.channel.send(
-            "Please use the commnd `"
+            ">>> Please use the commnd `"
             + cfg.PREFIX
             + "rename <new name>` to rename your kingdom."
         )
@@ -89,18 +95,23 @@ async def rename_kingdom(ctx, *args):
     new_name = args[0]
 
     await ctx.channel.send(
-        "Are you sure you would like to name your kingdom **" + new_name + "**? (y/n)"
+        ">>> Are you sure you would like to name your kingdom **" + new_name + "**? (y/n)"
     )
 
     # Pre-condition check for wait_for function
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    msg = await bot.wait_for("message", check=check)
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+
+    except asyncio.TimeoutError:
+        await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        return
 
     # User cancelled the kingdom creation
     if msg.content.lower() == "n":
-        await ctx.channel.send("Kingdom rename cancelled!")
+        await ctx.channel.send(">>> Kingdom rename cancelled!")
         return
 
     cfg.db_cur.execute(
@@ -108,7 +119,7 @@ async def rename_kingdom(ctx, *args):
     )
     cfg.db_con.commit()
 
-    await ctx.channel.send("Kingdom renamed to '" + new_name + "'.")
+    await ctx.channel.send(">>> Kingdom renamed to **" + new_name + "**.")
 
 
 # Command to purchase new units
@@ -131,8 +142,8 @@ async def buy_troops(ctx, *args):
         return
 
     elif action == "buy":
-        if len(args) < 2:
-            await ctx.channel.send(
+        if len(args) < 2 or not args[1].isnumeric():
+            await ctx.author.send(
                 ">>> Use the command `"
                 + cfg.PREFIX
                 + "shop buy <index> [amount]` to purchase a new unit."
@@ -147,7 +158,7 @@ async def buy_troops(ctx, *args):
 
 
 async def purchase_unit(ctx, args):
-    index = int(args[0]) - 1
+    index = int(args[1]) - 1
 
     # Check if index is valid
     if not (
@@ -155,12 +166,12 @@ async def purchase_unit(ctx, args):
         and index
         <= len(cfg.config["attack_options"]) + len(cfg.config["defence_options"]) - 1
     ):
-        await ctx.channel.send("Index out of range! Cancelling.")
+        await ctx.author.send(">>> Index out of range! Cancelling purchase.")
         return
 
     # Check if amount is valid
-    if len(args) == 2 and args[1].isnumeric() and int(args[1]) > 0:
-        amount_to_purchase = int(args[1])
+    if len(args) >= 3 and args[2].isnumeric() and int(args[2]) > 0:
+        amount_to_purchase = int(args[2])
     else:
         amount_to_purchase = 1
 
@@ -174,7 +185,7 @@ async def purchase_unit(ctx, args):
         if not shared.check_funds_available(
             ctx, to_purchase["price"], amount_to_purchase
         ):
-            await ctx.channel.send(
+            await ctx.author.send(
                 ">>> Sorry, you need at least `"
                 + str(total_price)
                 + "` doubloons to purchase those defence units. Purchase cancelled."
@@ -191,7 +202,7 @@ async def purchase_unit(ctx, args):
         if not shared.check_funds_available(
             ctx, to_purchase["price"], amount_to_purchase
         ):
-            await ctx.channel.send(
+            await ctx.author.send(
                 ">>> Sorry, you need at least `"
                 + str(total_price)
                 + "` doubloons to purchase those attack units. Purchase cancelled."
@@ -204,12 +215,12 @@ async def purchase_unit(ctx, args):
     if purchased == None:
         return
 
-    await ctx.channel.send(
+    await ctx.author.send(
         ">>> Purchased "
         + str(amount_to_purchase)
-        + " '"
+        + " **"
         + str(purchased["name"])
-        + "' unit(s) for `"
+        + "** unit(s) for `"
         + str(total_price)
         + "` doubloons."
     )
@@ -239,7 +250,7 @@ async def show_purchase_options(ctx):
         "\nUse the command `" + cfg.PREFIX + "shop <index> [amount]` to purchase units."
     )
 
-    await ctx.channel.send(to_send)
+    await ctx.author.send(to_send)
 
 
 # Purchase an attack unit
@@ -251,21 +262,26 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    await ctx.channel.send(
+    await ctx.author.send(
         ">>> Are you sure you would like to purchase "
         + str(amount)
         + " **"
         + str(to_purchase["name"])
-        + "** for `"
+        + "** unit(s) for `"
         + str(total_price)
         + str("` doubloon(s)? (y/n)")
     )
 
-    msg = await bot.wait_for("message", check=check)
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+
+    except asyncio.TimeoutError:
+        await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        return
 
     # User cancelled the purchase
     if msg.content.lower() == "n":
-        await ctx.channel.send(">>> Purchase cancelled!")
+        await ctx.author.send(">>> Purchase cancelled!")
         return
 
     # Remove price from user's doubloon balance
@@ -293,21 +309,26 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    await ctx.channel.send(
+    await ctx.author.send(
         ">>> Are you sure you would like to purchase "
         + str(amount)
         + " **"
         + str(to_purchase["name"])
-        + "** for `"
+        + "** unit(s) for `"
         + str(total_price)
         + str("` doubloon(s)? (y/n)")
     )
 
-    msg = await bot.wait_for("message", check=check)
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+
+    except asyncio.TimeoutError:
+        await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        return
 
     # User cancelled the purchase
     if msg.content.lower() == "n":
-        await ctx.channel.send(">>> Purchase cancelled!")
+        await ctx.author.send(">>> Purchase cancelled!")
         return
 
     # Remove price from user's doubloon balance
@@ -325,7 +346,7 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
 
 
 async def show_shop_help(ctx):
-    await ctx.channel.send(">>> " + get_shop_help_string())
+    await ctx.author.send(">>> " + get_shop_help_string())
 
 
 def get_shop_help_string():

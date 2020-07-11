@@ -5,6 +5,7 @@
     "starter_balance": 1000,
     "tax_base": 5,
     "tax_change": 3,
+    "wait_timeout": 15,
     "attack_options": [
         {
             "name": "Cheapus",

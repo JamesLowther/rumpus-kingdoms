@@ -19,11 +19,11 @@ async def shutdown(ctx):
         cfg.db_con.close()
         cfg.scheduler.shutdown_threads()
 
-        await ctx.channel.send("The rumpus room remains unguarded. Tread carefully.")
+        await ctx.channel.send(">>> The rumpus room remains unguarded. Tread carefully.")
         await bot.logout()
 
     else:
-        await ctx.channel.send("Sorry! You don't have permission to do that!")
+        await ctx.channel.send(">>> Sorry! You don't have permission to do that!")
 
 
 # Reload game data from config file
@@ -33,10 +33,10 @@ async def reload_config(ctx):
 
     if check_root(ctx.author.id):
         read_json()
-        await ctx.channel.send("Reload successful!")
+        await ctx.channel.send(">>> Reload successful!")
 
     else:
-        await ctx.channel.send("Sorry! You don't have permission to do that!")
+        await ctx.channel.send(">>> Sorry! You don't have permission to do that!")
 
 
 # Checks if the id is in the ROOT_IDS list

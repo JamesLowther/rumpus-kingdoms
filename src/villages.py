@@ -1,6 +1,7 @@
 from discord.ext import commands
 from cfg import bot
 
+import asyncio
 import cfg, management, shared, kingdoms
 
 
@@ -23,7 +24,7 @@ async def village_options(ctx, *args):
 
     elif action == "buy":
         if len(args) < 2:
-            await ctx.channel.send(
+            await ctx.author.send(
                 ">>> Use the command `"
                 + cfg.PREFIX
                 + "village buy <name>` to purchase a new village."
@@ -34,7 +35,7 @@ async def village_options(ctx, *args):
 
     elif action == "upgrade":
         if len(args) < 2:
-            await ctx.channel.send(
+            await ctx.author.send(
                 ">>> Use the command `"
                 + cfg.PREFIX
                 + "village upgrade <index>` to upgrade a village."
@@ -45,7 +46,7 @@ async def village_options(ctx, *args):
 
     elif action == "rename":
         if len(args) < 3:
-            await ctx.channel.send(
+            await ctx.author.send(
                 ">>> Use the command `"
                 + cfg.PREFIX
                 + "village rename <index> <name>` to rename a village."
@@ -59,7 +60,7 @@ async def village_options(ctx, *args):
 
 
 async def show_village_help(ctx):
-    await ctx.channel.send(">>> " + get_village_help_string())
+    await ctx.author.send(">>> " + get_village_help_string())
 
 
 def get_village_help_string():
@@ -100,7 +101,7 @@ async def list_villages(ctx):
         "Villages", ["Name", "Population"], ["v_name", "population"], results, 0
     )
 
-    await ctx.channel.send(to_send)
+    await ctx.author.send(to_send)
 
 
 async def buy_village(ctx, args):
@@ -108,14 +109,14 @@ async def buy_village(ctx, args):
     village_price = calculate_village_price()
 
     if not shared.check_funds_available(ctx, village_price, 1):
-        await ctx.channel.send(
+        await ctx.author.send(
             ">>> Sorry, you need at least `"
             + str(village_price)
             + "` doubloons to purchase a new village. Purchase cancelled."
         )
         return
 
-    await ctx.channel.send(
+    await ctx.author.send(
         ">>> Are you sure you would like to buy the village called **"
         + village_name
         + "** for `"
@@ -127,11 +128,16 @@ async def buy_village(ctx, args):
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    msg = await bot.wait_for("message", check=check)
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+
+    except asyncio.TimeoutError:
+        await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        return
 
     # User cancelled the kingdom creation
     if msg.content.lower() == "n":
-        await ctx.channel.send(">>> Village purchase cancelled!")
+        await ctx.author.send(">>> Village purchase cancelled!")
         return
 
     # Remove price from user's doubloon balance
@@ -156,7 +162,7 @@ async def buy_village(ctx, args):
 
     cfg.db_con.commit()
 
-    await ctx.channel.send(
+    await ctx.author.send(
         ">>> Purchased '"
         + str(village_name)
         + "' for `"
@@ -177,7 +183,7 @@ async def upgrade_village(ctx, args):
     if not args[1].isnumeric() or int(args[1]) < 1 or int(args[1]) > len(results):
         to_send = ">>> "
         to_send += "Index out of range!"
-        await ctx.channel.send(to_send)
+        await ctx.author.send(to_send)
 
         return
 
@@ -186,14 +192,14 @@ async def upgrade_village(ctx, args):
     pop_increase = calculate_population_increase()
 
     if not shared.check_funds_available(ctx, upgrade_price, 1):
-        await ctx.channel.send(
+        await ctx.author.send(
             ">>> Sorry, you need at least `"
             + str(upgrade_price)
             + "` doubloons to upgrade this village. Upgrade cancelled."
         )
         return
 
-    await ctx.channel.send(
+    await ctx.author.send(
         ">>> Are you sure you would like to upgrade **"
         + str(target_village["v_name"])
         + "** and boost its population by `"
@@ -207,11 +213,16 @@ async def upgrade_village(ctx, args):
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    msg = await bot.wait_for("message", check=check)
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+
+    except asyncio.TimeoutError:
+        await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        return
 
     # User cancelled the kingdom creation
     if msg.content.lower() == "n":
-        await ctx.channel.send(">>> Village upgrade cancelled!")
+        await ctx.author.send(">>> Village upgrade cancelled!")
         return
 
     # Update village name in database
@@ -222,7 +233,7 @@ async def upgrade_village(ctx, args):
 
     cfg.db_con.commit()
 
-    await ctx.channel.send("Village successfully upgraded!")
+    await ctx.author.send("Village successfully upgraded!")
 
 
 async def rename_village(ctx, args):
@@ -237,14 +248,14 @@ async def rename_village(ctx, args):
     if not args[1].isnumeric() or int(args[1]) < 1 or int(args[1]) > len(results):
         to_send = ">>> "
         to_send += "Index out of range!"
-        await ctx.channel.send(to_send)
+        await ctx.author.send(to_send)
 
         return
 
     target_village = results[int(args[1]) - 1]
     new_name = " ".join(args[2:])
 
-    await ctx.channel.send(
+    await ctx.author.send(
         ">>> Are you sure you would like to rename **"
         + str(target_village["v_name"])
         + "** to **"
@@ -256,11 +267,16 @@ async def rename_village(ctx, args):
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    msg = await bot.wait_for("message", check=check)
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+
+    except asyncio.TimeoutError:
+        await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        return
 
     # User cancelled the kingdom creation
     if msg.content.lower() == "n":
-        await ctx.channel.send(">>> Village rename cancelled!")
+        await ctx.author.send(">>> Village rename cancelled!")
         return
 
     # Update village name in database
@@ -271,7 +287,7 @@ async def rename_village(ctx, args):
 
     cfg.db_con.commit()
 
-    await ctx.channel.send("Village successfully renamed!")
+    await ctx.author.send(">>> Village successfully renamed!")
 
 
 def calculate_village_price():
