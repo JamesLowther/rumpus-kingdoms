@@ -2,6 +2,7 @@ from discord.ext import commands
 from cfg import bot
 
 from random import uniform, choice
+from time import time, strftime, gmtime
 import cfg, kingdoms
 
 
@@ -16,7 +17,9 @@ async def collect_tax(ctx):
     # Check if user has already collected tax
     if check_tax_collected_today(ctx):
         to_send = ">>> "
-        to_send += "You already collected tax today! Please try again tomorrow!"
+        to_send += "You already collected tax today! You can collect tax again in **"
+        to_send += get_collect_time_remaining(ctx)
+        to_send += "**!"
 
         await ctx.channel.send(to_send)
         return
@@ -37,7 +40,7 @@ async def collect_tax(ctx):
     num_villages = result["num_villages"]
 
     add_doubloons(ctx, tax_collected)
-    set_tax_collected_flag(ctx, 1)
+    update_tax_collected(ctx)
 
     await send_tax_collected_message(ctx, tax_collected, num_villages, total_pop)
 
@@ -56,17 +59,28 @@ async def show_tax_rate(ctx):
 # Returns true if tax collection flag is set
 def check_tax_collected_today(ctx):
     cfg.db_cur.execute("SELECT tax_collected FROM Users WHERE uid=?;", (ctx.author.id,))
-    result = cfg.db_cur.fetchone()
+    prev_time = cfg.db_cur.fetchone()['tax_collected']
+    delta_time = int(time()) - prev_time
 
-    return result["tax_collected"]
+    return delta_time < cfg.config['collect_timeout']
 
+
+def get_collect_time_remaining(ctx):
+    
+    cfg.db_cur.execute("SELECT tax_collected FROM Users WHERE uid=?;", (ctx.author.id,))
+    prev_time = cfg.db_cur.fetchone()['tax_collected']
+    delta_time = int(time()) - prev_time
+
+    remaining_time = cfg.config['collect_timeout'] - delta_time
+
+    remaining_time_string = strftime("%H hour(s), %M minute(s), and %S second(s)", gmtime(remaining_time))
+    return remaining_time_string
 
 # Sets the tax collected to a new value
-def set_tax_collected_flag(ctx, value):
-    assert value in {0, 1}
+def update_tax_collected(ctx):
 
     cfg.db_cur.execute(
-        "UPDATE Users SET tax_collected=? WHERE uid=?;", (value, ctx.author.id)
+        "UPDATE Users SET tax_collected=? WHERE uid=?;", (int(time()), ctx.author.id)
     )
     cfg.db_con.commit()
 
@@ -123,7 +137,9 @@ async def send_tax_collected_message(ctx, tax_collected, num_villages, total_pop
     to_send += "You collected `" + str(tax_collected)
     to_send += "` doubloons from `" + str(total_pop)
     to_send += "` Rumplins in `" + str(num_villages)
-    to_send += "` villages! Don't forget to collect tax again tomorrow!"
+    to_send += "` villages! You can collect tax again in **"
+    to_send += get_collect_time_remaining(ctx)
+    to_send += "**!"
 
     await ctx.channel.send(to_send)
 

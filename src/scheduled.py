@@ -29,6 +29,5 @@ class Scheduler:
 
 
 # Add scheduled events here
-schedule.every().day.at("23:59").do(currency.reset_tax_collected_flag)
 schedule.every().day.at("23:59").do(currency.calculate_new_tax_rate)
 # schedule.every(3).seconds.do(test)

@@ -1,6 +1,7 @@
 from discord.ext import commands
 from cfg import bot
 
+from time import time, strftime, gmtime
 import asyncio
 import cfg, shared, kingdoms
 
@@ -30,23 +31,29 @@ async def list_players(ctx):
 def get_all_kingdoms():
     # cfg.db_cur.execute("SELECT k.uid, k.k_name, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid;")
     cfg.db_cur.execute(
-        "SELECT k.uid, k.been_attacked, k.has_attacked, k.k_name, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid;"
+        "SELECT *, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid;"
     )
     return cfg.db_cur.fetchall()
 
 
 # Returns all kingdoms
 # uid, k_name, number of villages
-def get_all_non_attacked_kingdoms(ctx):
+def get_all_kingdoms_for_attack(ctx):
     cfg.db_cur.execute(
         "SELECT *, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid WHERE k.been_attacked != 1 AND k.uid != ? AND s.count > 0;",
         (str(ctx.author.id),),
     )
-    # cfg.db_cur.execute(
-    #    "SELECT *, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid WHERE k.been_attacked != 1 AND s.count > 0;",
-    # )
     return cfg.db_cur.fetchall()
 
+
+def get_all_non_attacked_kingdoms(ctx):
+    all_kingdoms = get_all_kingdoms_for_attack(ctx)
+
+    for kingdom in all_kingdoms:
+        if check_been_attacked_today(kingdom['uid']):
+            all_kingdoms.remove(kingdom)
+
+    return all_kingdoms
 
 @bot.command(name="attack")
 async def attack_user(ctx):
@@ -98,10 +105,12 @@ async def check_attack_prereqs(ctx):
         )
         return False
 
-    if get_has_attacked(ctx) == 1:
-        await ctx.channel.send(
-            ">>> You have already attacked another kingdom today! Please wait until tomorrow!"
-        )
+    if check_has_attacked_today(ctx):
+        to_send = ">>> You have already attacked another kingdom recently! You can attack again in **"
+        to_send += get_has_attacked_time_remaining(ctx)
+        to_send += "**!"
+        
+        await ctx.channel.send(to_send)
         return False
 
     return True
@@ -123,12 +132,40 @@ def get_village_count(ctx):
     return cfg.db_cur.fetchone()["count"]
 
 
-def get_has_attacked(ctx):
+def check_has_attacked_today(ctx):
     cfg.db_cur.execute(
         "SELECT k.has_attacked FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
         (str(ctx.author.id),),
     )
-    return cfg.db_cur.fetchone()["has_attacked"]
+    prev_time = cfg.db_cur.fetchone()['has_attacked']
+    delta_time = int(time()) - prev_time
+    
+    return delta_time < cfg.config['attack_timeout']
+
+
+def check_been_attacked_today(uid):
+    cfg.db_cur.execute(
+        "SELECT k.been_attacked FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
+        (uid,)
+    )
+    prev_time = cfg.db_cur.fetchone()['been_attacked']
+    delta_time = int(time()) - prev_time
+    
+    return delta_time < cfg.config['attacked_timeout']
+
+
+def get_has_attacked_time_remaining(ctx):
+    cfg.db_cur.execute(
+        "SELECT k.has_attacked FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
+        (str(ctx.author.id),),
+    )
+    prev_time = cfg.db_cur.fetchone()['has_attacked']
+    delta_time = int(time()) - prev_time
+
+    remaining_time = cfg.config['attack_timeout'] - delta_time
+
+    remaining_time_string = strftime("%H hour(s), %M minute(s), and %S second(s)", gmtime(remaining_time))
+    return remaining_time_string
 
 
 async def choose_kingdom_to_attack(ctx, all_kingdoms):
@@ -152,7 +189,7 @@ async def choose_kingdom_to_attack(ctx, all_kingdoms):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:
@@ -191,7 +228,7 @@ async def choose_number_attack_units(ctx):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:
@@ -222,8 +259,8 @@ async def handle_successful_attack(ctx, attacked_kingdom, number_attack_units):
     user_kid = get_kid_from_uid(str(ctx.author.id))
     transferred_village = transfer_lowest_pop_village(attacked_kingdom["kid"], user_kid)
 
-    set_been_attacked_flag(attacked_kingdom["kid"])
-    set_has_attacked_flag(user_kid)
+    update_been_attacked(attacked_kingdom["kid"])
+    update_has_attacked(user_kid)
 
     to_send = ">>> "
     to_send += "Your attack against **"
@@ -235,7 +272,9 @@ async def handle_successful_attack(ctx, attacked_kingdom, number_attack_units):
     to_send += str(transferred_village["v_name"])
     to_send += "** which has a population of `"
     to_send += str(transferred_village["population"])
-    to_send += "`!\n\nYou must wait until tomorrow before you can attack again."
+    to_send += "`!\n\nYou can attack again in **"
+    to_send += get_has_attacked_time_remaining(ctx)
+    to_send+= "**!"
 
     await ctx.channel.send(to_send)
 
@@ -251,8 +290,8 @@ async def handle_failed_attack(ctx, attacked_kingdom, number_attack_units):
     user_kid = get_kid_from_uid(str(ctx.author.id))
     transferred_village = transfer_lowest_pop_village(user_kid, attacked_kingdom["kid"])
 
-    set_been_attacked_flag(attacked_kingdom["kid"])
-    set_has_attacked_flag(user_kid)
+    update_been_attacked(attacked_kingdom["kid"])
+    update_has_attacked(user_kid)
 
     to_send = ">>> "
     to_send += "Your attack against **"
@@ -264,7 +303,9 @@ async def handle_failed_attack(ctx, attacked_kingdom, number_attack_units):
     to_send += str(transferred_village["v_name"])
     to_send += "** which had a population of `"
     to_send += str(transferred_village["population"])
-    to_send += "`!\n\nYou must wait until tomorrow before you can attack again."
+    to_send += "`!\n\nYou can attack again in **"
+    to_send += get_has_attacked_time_remaining(ctx)
+    to_send += "**!"
 
     await ctx.channel.send(to_send)
 
@@ -306,11 +347,11 @@ def transfer_lowest_pop_village(from_kid, to_kid):
     return lowest_village
 
 
-def set_been_attacked_flag(kid):
-    cfg.db_cur.execute("UPDATE Kingdoms SET been_attacked=1 WHERE kid=?;", (kid,))
+def update_been_attacked(kid):
+    cfg.db_cur.execute("UPDATE Kingdoms SET been_attacked=? WHERE kid=?;", (int(time()), kid,))
     cfg.db_con.commit()
 
 
-def set_has_attacked_flag(kid):
-    cfg.db_cur.execute("UPDATE Kingdoms SET has_attacked=1 WHERE kid=?;", (kid,))
+def update_has_attacked(kid):
+    cfg.db_cur.execute("UPDATE Kingdoms SET has_attacked=? WHERE kid=?;", (int(time()), kid,))
     cfg.db_con.commit()

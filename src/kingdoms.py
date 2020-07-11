@@ -31,7 +31,7 @@ async def init_kingdom(ctx, *args):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:
@@ -108,7 +108,7 @@ async def rename_kingdom(ctx, *args):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:
@@ -280,7 +280,7 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:
@@ -329,7 +329,7 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:

@@ -134,7 +134,7 @@ async def buy_village(ctx, args):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:
@@ -221,7 +221,7 @@ async def upgrade_village(ctx, args):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:
@@ -277,7 +277,7 @@ async def rename_village(ctx, args):
 
     try:
         msg = await bot.wait_for(
-            "message", check=check, timeout=cfg.config["wait_timeout"]
+            "message", check=check, timeout=cfg.config["reply_timeout"]
         )
 
     except asyncio.TimeoutError:

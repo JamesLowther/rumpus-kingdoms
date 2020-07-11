@@ -5,7 +5,10 @@
     "starter_balance": 1000,
     "tax_base": 5,
     "tax_change": 3,
-    "wait_timeout": 15,
+    "reply_timeout": 15,
+    "collect_timeout": 120,
+    "attack_timeout": 10,
+    "attacked_timeout": 30,
     "attack_options": [
         {
             "name": "Cheapus",
