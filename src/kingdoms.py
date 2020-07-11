@@ -214,6 +214,7 @@ async def purchase_unit(ctx, args):
         + "` doubloons."
     )
 
+
 # Displays all purchasable units
 # todo: this code is messy
 async def show_purchase_options(ctx):
@@ -235,9 +236,7 @@ async def show_purchase_options(ctx):
         len(cfg.config["attack_options"]),
     )
     to_send += (
-        "\nUse the command `"
-        + cfg.PREFIX
-        + "shop <index> [amount]` to purchase units."
+        "\nUse the command `" + cfg.PREFIX + "shop <index> [amount]` to purchase units."
     )
 
     await ctx.channel.send(to_send)
@@ -331,8 +330,16 @@ async def show_shop_help(ctx):
 
 def get_shop_help_string():
     to_send = "**Shop Commands** \n```"
-    to_send += cfg.PREFIX + "shop help                      :  Show available shop commands\n"
-    to_send += cfg.PREFIX + "shop list                      :  List all of the units available to purchase\n"
-    to_send += cfg.PREFIX + "shop buy <index> [amout]       :  Buy [amount] number of units at <index>```"
+    to_send += (
+        cfg.PREFIX + "shop help                      :  Show available shop commands\n"
+    )
+    to_send += (
+        cfg.PREFIX
+        + "shop list                      :  List all of the units available to purchase\n"
+    )
+    to_send += (
+        cfg.PREFIX
+        + "shop buy <index> [amout]       :  Buy [amount] number of units at <index>```"
+    )
 
     return to_send

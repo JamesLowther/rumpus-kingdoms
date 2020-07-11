@@ -61,15 +61,31 @@ async def village_options(ctx, *args):
 async def show_village_help(ctx):
     await ctx.channel.send(">>> " + get_village_help_string())
 
+
 def get_village_help_string():
     to_send = "**Village Commands**\n```"
-    to_send += cfg.PREFIX + "village help                   :  Show available village commands\n"
-    to_send += cfg.PREFIX + "village list                   :  List all of your villages\n"
-    to_send += cfg.PREFIX + "village buy <name>             :  Buy a new village titled <name>\n"
-    to_send += cfg.PREFIX + "village upgrade <index>        :  Increase the population of the village at <index>\n"
-    to_send += cfg.PREFIX + "village rename <index> <name>  :  Rename village at <index> to <name>```"
+    to_send += (
+        cfg.PREFIX
+        + "village help                   :  Show available village commands\n"
+    )
+    to_send += (
+        cfg.PREFIX + "village list                   :  List all of your villages\n"
+    )
+    to_send += (
+        cfg.PREFIX
+        + "village buy <name>             :  Buy a new village titled <name>\n"
+    )
+    to_send += (
+        cfg.PREFIX
+        + "village upgrade <index>        :  Increase the population of the village at <index>\n"
+    )
+    to_send += (
+        cfg.PREFIX
+        + "village rename <index> <name>  :  Rename village at <index> to <name>```"
+    )
 
     return to_send
+
 
 async def list_villages(ctx):
     cfg.db_cur.execute(
