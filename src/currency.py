@@ -18,7 +18,7 @@ async def collect_tax(ctx):
         to_send = ">>> "
         to_send += "You already collected tax today! Please try again tomorrow!"
 
-        await ctx.author.send(to_send)
+        await ctx.channel.send(to_send)
         return
 
     # Count the total population of a kingdom
@@ -27,6 +27,10 @@ async def collect_tax(ctx):
         (str(ctx.author.id),),
     )
     result = cfg.db_cur.fetchone()
+
+    if result['num_villages'] == 0:
+        await ctx.channel.send(">>> You need to have at least one village before you can collect taxes!")
+        return
 
     total_pop = result["total_pop"]
     tax_collected = calculate_tax_amount(total_pop)
@@ -121,7 +125,7 @@ async def send_tax_collected_message(ctx, tax_collected, num_villages, total_pop
     to_send += "` Rumplins in `" + str(num_villages)
     to_send += "` villages! Don't forget to collect tax again tomorrow!"
 
-    await ctx.author.send(to_send)
+    await ctx.channel.send(to_send)
 
 
 def get_tax_help_string():

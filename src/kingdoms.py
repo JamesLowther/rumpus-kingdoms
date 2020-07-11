@@ -69,7 +69,7 @@ async def handle_no_kingdom(ctx):
 
 # Called if a user already has a kingdom but shouldn't
 async def handle_existing_kingdom(ctx):
-    await ctx.channel.send(">>> You already have a kingdom " + str(ctx.author) + "!")
+    await ctx.channel.send(">>> You already have a kingdom!")
 
 
 # Return if a user already has a kingdom
@@ -149,7 +149,7 @@ async def buy_troops(ctx, *args):
 
     elif action == "buy":
         if len(args) < 2 or not args[1].isnumeric():
-            await ctx.author.send(
+            await ctx.channel.send(
                 ">>> Use the command `"
                 + cfg.PREFIX
                 + "shop buy <index> [amount]` to purchase a new unit."
@@ -172,7 +172,7 @@ async def purchase_unit(ctx, args):
         and index
         <= len(cfg.config["attack_options"]) + len(cfg.config["defence_options"]) - 1
     ):
-        await ctx.author.send(">>> Index out of range! Cancelling purchase.")
+        await ctx.channel.send(">>> Index out of range! Cancelling purchase.")
         return
 
     # Check if amount is valid
@@ -191,7 +191,7 @@ async def purchase_unit(ctx, args):
         if not shared.check_funds_available(
             ctx, to_purchase["price"], amount_to_purchase
         ):
-            await ctx.author.send(
+            await ctx.channel.send(
                 ">>> Sorry, you need at least `"
                 + str(total_price)
                 + "` doubloons to purchase those defence units. Purchase cancelled."
@@ -208,7 +208,7 @@ async def purchase_unit(ctx, args):
         if not shared.check_funds_available(
             ctx, to_purchase["price"], amount_to_purchase
         ):
-            await ctx.author.send(
+            await ctx.channel.send(
                 ">>> Sorry, you need at least `"
                 + str(total_price)
                 + "` doubloons to purchase those attack units. Purchase cancelled."
@@ -221,7 +221,7 @@ async def purchase_unit(ctx, args):
     if purchased == None:
         return
 
-    await ctx.author.send(
+    await ctx.channel.send(
         ">>> Purchased "
         + str(amount_to_purchase)
         + " **"
@@ -256,7 +256,7 @@ async def show_purchase_options(ctx):
         "\nUse the command `" + cfg.PREFIX + "shop <index> [amount]` to purchase units."
     )
 
-    await ctx.author.send(to_send)
+    await ctx.channel.send(to_send)
 
 
 # Purchase an attack unit
@@ -268,7 +268,7 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    await ctx.author.send(
+    await ctx.channel.send(
         ">>> Are you sure you would like to purchase "
         + str(amount)
         + " **"
@@ -289,7 +289,7 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
 
     # User cancelled the purchase
     if msg.content.lower() == "n":
-        await ctx.author.send(">>> Purchase cancelled!")
+        await ctx.channel.send(">>> Purchase cancelled!")
         return
 
     # Remove price from user's doubloon balance
@@ -317,7 +317,7 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
     def check(msg):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
-    await ctx.author.send(
+    await ctx.channel.send(
         ">>> Are you sure you would like to purchase "
         + str(amount)
         + " **"
@@ -338,7 +338,7 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
 
     # User cancelled the purchase
     if msg.content.lower() == "n":
-        await ctx.author.send(">>> Purchase cancelled!")
+        await ctx.channel.send(">>> Purchase cancelled!")
         return
 
     # Remove price from user's doubloon balance
@@ -356,7 +356,7 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
 
 
 async def show_shop_help(ctx):
-    await ctx.author.send(">>> " + get_shop_help_string())
+    await ctx.channel.send(">>> " + get_shop_help_string())
 
 
 def get_shop_help_string():

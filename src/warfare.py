@@ -64,6 +64,10 @@ async def attack_user(ctx):
         all_kingdoms, "uid", "username"
     )
 
+    if len(all_kingdoms) == 0:
+        await ctx.channel.send(">>> There are currently no kingdoms that can be attacked!")
+        return
+
     attacked_kingdom = await choose_kingdom_to_attack(ctx, converted_all_kingdoms)
     if not attacked_kingdom:
         return
@@ -83,19 +87,19 @@ async def attack_user(ctx):
 
 async def check_attack_prereqs(ctx):
     if not get_village_count(ctx) > 0:
-        await ctx.author.send(
-            ">>> You need to have at least 1 village to attack another user!"
+        await ctx.channel.send(
+            ">>> You need to have at least one village to attack another user!"
         )
         return False
 
     if not get_number_units(str(ctx.author.id))["attack"] > 0:
-        await ctx.author.send(
-            ">>> You need to have at least 1 attack unit to attack another user!"
+        await ctx.channel.send(
+            ">>> You need to have at least one attack unit to attack another user!"
         )
         return False
 
     if get_has_attacked(ctx) == 1:
-        await ctx.author.send(
+        await ctx.channel.send(
             ">>> You have already attacked another kingdom today! Please wait until tomorrow!"
         )
         return False
@@ -138,7 +142,7 @@ async def choose_kingdom_to_attack(ctx, all_kingdoms):
     )
     to_send += "\nPlease select the index of the kingdom you want to attack or type 'cancel' to stop the attack"
 
-    await ctx.author.send(to_send)
+    await ctx.channel.send(to_send)
 
     # Pre-condition check for wait_for function
     def check(msg):
@@ -156,14 +160,14 @@ async def choose_kingdom_to_attack(ctx, all_kingdoms):
         return
 
     if msg.content.lower() == "cancel":
-        await ctx.author.send(">>> Attack cancelled!")
+        await ctx.channel.send(">>> Attack cancelled!")
         return False
 
     index_range = len(all_kingdoms)
     index = int(msg.content)
 
     if index <= 0 or index > index_range:
-        await ctx.author.send(">>> Index out of range! Cancelling attack!")
+        await ctx.channel.send(">>> Index out of range! Cancelling attack!")
         return False
 
     return all_kingdoms[index - 1]
@@ -177,7 +181,7 @@ async def choose_number_attack_units(ctx):
     to_send += str(number_units["attack"])
     to_send += "` attack unit(s)."
 
-    await ctx.author.send(to_send)
+    await ctx.channel.send(to_send)
 
     # Pre-condition check for wait_for function
     def check(msg):
@@ -195,13 +199,13 @@ async def choose_number_attack_units(ctx):
         return
 
     if msg.content.lower() == "cancel":
-        await ctx.author.send(">>> Attack cancelled!")
+        await ctx.channel.send(">>> Attack cancelled!")
         return False
 
     number_select = int(msg.content)
 
     if number_select <= 0 or number_select > number_units["attack"]:
-        await ctx.author.send(">>> Invalid number of attack units! Cancelling attack!")
+        await ctx.channel.send(">>> Invalid number of attack units! Cancelling attack!")
         return False
 
     return number_select
@@ -233,7 +237,7 @@ async def handle_successful_attack(ctx, attacked_kingdom, number_attack_units):
     to_send += str(transferred_village["population"])
     to_send += "`!\n\nYou must wait until tomorrow before you can attack again."
 
-    await ctx.author.send(to_send)
+    await ctx.channel.send(to_send)
 
 
 async def handle_failed_attack(ctx, attacked_kingdom, number_attack_units):
@@ -262,7 +266,7 @@ async def handle_failed_attack(ctx, attacked_kingdom, number_attack_units):
     to_send += str(transferred_village["population"])
     to_send += "`!\n\nYou must wait until tomorrow before you can attack again."
 
-    await ctx.author.send(to_send)
+    await ctx.channel.send(to_send)
 
 
 def remove_attack_units(uid, to_remove):
