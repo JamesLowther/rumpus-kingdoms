@@ -22,7 +22,7 @@ async def list_players(ctx):
         False,
     )
 
-    await ctx.channel.send(kingdom_table)
+    await ctx.channel.send(">>> " + kingdom_table)
 
 
 # Returns all kingdoms
@@ -40,11 +40,11 @@ def get_all_kingdoms():
 def get_all_non_attacked_kingdoms(ctx):
     cfg.db_cur.execute(
         "SELECT *, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid WHERE k.been_attacked != 1 AND k.uid != ? AND s.count > 0;",
-        (str(ctx.author.id),)
+        (str(ctx.author.id),),
     )
-    #cfg.db_cur.execute(
+    # cfg.db_cur.execute(
     #    "SELECT *, s.count FROM Kingdoms k LEFT JOIN (SELECT k2.uid, COUNT(v2.vid) as count FROM Kingdoms k2 LEFT JOIN Villages v2 on k2.kid=v2.kid GROUP BY k2.uid) s ON s.uid=k.uid WHERE k.been_attacked != 1 AND s.count > 0;",
-    #)
+    # )
     return cfg.db_cur.fetchall()
 
 
@@ -147,7 +147,9 @@ async def choose_kingdom_to_attack(ctx, all_kingdoms):
         ) and msg.author.id == ctx.author.id
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
@@ -184,7 +186,9 @@ async def choose_number_attack_units(ctx):
         ) and msg.author.id == ctx.author.id
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
@@ -214,7 +218,7 @@ async def handle_successful_attack(ctx, attacked_kingdom, number_attack_units):
     user_kid = get_kid_from_uid(str(ctx.author.id))
     transferred_village = transfer_lowest_pop_village(attacked_kingdom["kid"], user_kid)
 
-    set_been_attacked_flag(attacked_kingdom['kid'])
+    set_been_attacked_flag(attacked_kingdom["kid"])
     set_has_attacked_flag(user_kid)
 
     to_send = ">>> "
@@ -243,7 +247,7 @@ async def handle_failed_attack(ctx, attacked_kingdom, number_attack_units):
     user_kid = get_kid_from_uid(str(ctx.author.id))
     transferred_village = transfer_lowest_pop_village(user_kid, attacked_kingdom["kid"])
 
-    set_been_attacked_flag(attacked_kingdom['kid'])
+    set_been_attacked_flag(attacked_kingdom["kid"])
     set_has_attacked_flag(user_kid)
 
     to_send = ">>> "
@@ -270,7 +274,8 @@ def remove_attack_units(uid, to_remove):
 
 def remove_defence_units(uid, to_remove):
     cfg.db_cur.execute(
-        "UPDATE Kingdoms SET defence = CASE WHEN (defence - ?) >= 0 THEN (defence - ?) ELSE 0 END WHERE uid=?;", (to_remove, to_remove, uid)
+        "UPDATE Kingdoms SET defence = CASE WHEN (defence - ?) >= 0 THEN (defence - ?) ELSE 0 END WHERE uid=?;",
+        (to_remove, to_remove, uid),
     )
     cfg.db_con.commit()
 

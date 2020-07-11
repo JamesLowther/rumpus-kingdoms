@@ -30,8 +30,10 @@ async def init_kingdom(ctx, *args):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
-    
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
+
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
         return
@@ -95,7 +97,9 @@ async def rename_kingdom(ctx, *args):
     new_name = args[0]
 
     await ctx.channel.send(
-        ">>> Are you sure you would like to name your kingdom **" + new_name + "**? (y/n)"
+        ">>> Are you sure you would like to name your kingdom **"
+        + new_name
+        + "**? (y/n)"
     )
 
     # Pre-condition check for wait_for function
@@ -103,7 +107,9 @@ async def rename_kingdom(ctx, *args):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
@@ -273,7 +279,9 @@ async def purchase_attack_unit(ctx, to_purchase, amount):
     )
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
@@ -320,7 +328,9 @@ async def purchase_defence_unit(ctx, to_purchase, amount):
     )
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")

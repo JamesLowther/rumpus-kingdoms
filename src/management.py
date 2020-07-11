@@ -19,7 +19,9 @@ async def shutdown(ctx):
         cfg.db_con.close()
         cfg.scheduler.shutdown_threads()
 
-        await ctx.channel.send(">>> The rumpus room remains unguarded. Tread carefully.")
+        await ctx.channel.send(
+            ">>> The rumpus room remains unguarded. Tread carefully."
+        )
         await bot.logout()
 
     else:

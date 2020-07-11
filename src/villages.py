@@ -129,7 +129,9 @@ async def buy_village(ctx, args):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
@@ -214,7 +216,9 @@ async def upgrade_village(ctx, args):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
@@ -268,7 +272,9 @@ async def rename_village(ctx, args):
         return msg.content.lower() in {"y", "n"} and msg.author.id == ctx.author.id
 
     try:
-        msg = await bot.wait_for("message", check=check, timeout=cfg.config['wait_timeout'])
+        msg = await bot.wait_for(
+            "message", check=check, timeout=cfg.config["wait_timeout"]
+        )
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
