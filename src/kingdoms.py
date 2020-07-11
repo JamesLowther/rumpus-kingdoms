@@ -45,14 +45,14 @@ async def init_kingdom(ctx, *args):
 
     create_kingdom(ctx, kingdom_name)
 
-    await ctx.channel.send(">>> Kingdom '" + kingdom_name + "' created!")
+    await ctx.channel.send(">>> Kingdom **" + kingdom_name + "** created!")
 
 
 # Insert the kingdom into the database
 def create_kingdom(ctx, kingdom_name):
     new_id = management.unique_ID("Kingdoms", "kid")
     cfg.db_cur.execute(
-        "INSERT INTO Kingdoms VALUES (?, ?, 0, 0, '', 0, 0, ?);",
+        "INSERT INTO Kingdoms VALUES (?, ?, 0, 0, 0, 0, ?);",
         (new_id, kingdom_name, str(ctx.author.id)),
     )
     cfg.db_con.commit()

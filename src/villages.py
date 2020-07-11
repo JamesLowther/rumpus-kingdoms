@@ -169,9 +169,9 @@ async def buy_village(ctx, args):
     cfg.db_con.commit()
 
     await ctx.channel.send(
-        ">>> Purchased '"
+        ">>> Purchased **"
         + str(village_name)
-        + "' for `"
+        + "** for `"
         + str(village_price)
         + "` doubloons."
     )

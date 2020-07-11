@@ -49,59 +49,70 @@
             "rank": 0,
             "name": "Peasant",
             "count": 0,
+            "reward": 1000,
             "modifier": 1
         },
         {
             "rank": 1,
             "name": "Serf",
             "count": 500,
+            "reward": 1000,
             "modifier": 0.98
         },
         {
             "rank": 2,
             "name": "Farmer",
             "count": 1000,
+            "reward": 1000,
             "modifier": 0.96
         },
         {
             "rank": 3,
             "name": "Merchant",
             "count": 1500,
+            "reward": 1000,
             "modifier": 0.96
         },
         {
             "rank": 4,
             "name": "Craftsmen",
+            "count": 2000,
+            "reward": 1000,
             "modifier": 0.96
         },
         {
             "rank": 5,
             "name": "Knight",
-            "count": 2000,
+            "count": 2500,
+            "reward": 1000,
             "modifier": 0.96
         },
         {
             "rank": 6,
             "name": "Nobel",
-            "count": 2500,
+            "count": 3000,
+            "reward": 1000,
             "modifier": 0.96
         },
         {
             "rank": 7,
             "name": "Lord",
-            "count": 3000,
+            "count": 3500,
+            "reward": 1000,
             "modifier": 0.96
         },
         {
             "rank": 8,
             "name": "Prince",
-            "count": 3500,
+            "count": 4000,
+            "reward": 1000,
             "modifier": 0.96
         },
         {
             "rank": 9,
             "name": "King",
-            "count": 4000,
+            "count": 4500,
+            "reward": 1000,
             "modifier": 0.96
         }
     ]

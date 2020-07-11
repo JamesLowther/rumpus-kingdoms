@@ -22,7 +22,6 @@ CREATE TABLE Kingdoms (
     k_name          text,
     attack          int,
     defence         int,
-    warcry          text,
     been_attacked   int,
     has_attacked    int,
     uid             text NOT NULL,

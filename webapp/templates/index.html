@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<html>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}"/>
+
+  <html>
+    <head>
+      <title>Rumpus Kingdoms</title>
+
+    <body>
+      <div id="container">
+        <main id="center" class="column">
+          <h1 style="text-align: center;">Rumpus Kingdoms</h1>
+          <!-- <img src={{ url_for('static', filename='title.png') }} class="center"> -->
+
+          {% if leaderboard %}
+            <table>
+            <tr>
+              <th></th>
+              <th>Username</th>
+              <th>Kingdom</th>
+              <th>Population</th>
+            </tr>
+            {% for item in leaderboard%}
+              <tr>
+                <td>{{ item.index }}</td>
+                <td>{{ item.username }}</td>
+                <td>{{ item.kingdom  }}</td>
+                <td>{{ item.population }}</td>
+              </tr>
+            {% endfor %}
+            </table>
+          {% endif %}
+        </main>
+      </div>
+    </body>
+  </html>
+</html>

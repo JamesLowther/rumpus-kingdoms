@@ -1,11 +1,11 @@
 from discord.ext import commands
 from cfg import bot
 
-import cfg
+import cfg, currency
 
 def check_message(ctx):
 
-    message = ctx.content
+    message = ctx.content.lower()
 
     if "rumpus" in message:
         update_rumpus_count(ctx, 1)
@@ -33,10 +33,13 @@ async def levelup_rank(ctx):
 
     if r_count >= needed_to_upgrade:
         upgrade_level(ctx, rank + 1)
+        currency.add_doubloons(ctx, new_rank['reward'])
 
         to_send = ">>> Wow! You've upgraded to the rank of **"
         to_send += new_rank['name']
-        to_send += "**!"
+        to_send += "**! You've been awarded `"
+        to_send += str(new_rank['reward'])
+        to_send += "` doubloons!"
 
         await ctx.channel.send(to_send)
 
