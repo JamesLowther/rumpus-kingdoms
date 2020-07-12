@@ -49,9 +49,26 @@ def check_root(user_id):
 # Create the user in the database
 def create_user(ctx):
     cfg.db_cur.execute(
-        "INSERT INTO Users VALUES (?, ?, 0, 0, 0, 0, NULL);",
-        (str(ctx.author.id), cfg.config["starter_balance"]),
+        "INSERT INTO Users VALUES (?, ?, ?, 0, 0, 0, 0, NULL);",
+        (str(ctx.author.id), str(ctx.author.name), cfg.config["starter_balance"]),
     )
+    cfg.db_con.commit()
+
+def update_all_usernames():
+    cfg.db_cur.execute("SELECT uid FROM Users;")
+    all_users = cfg.db_cur.fetchall()
+
+    for user in all_users:
+        uid = user['uid']
+        update_username(str(uid), cfg.bot.get_user(int(uid)).name)
+
+
+def update_username(uid, name):
+    cfg.db_cur.execute(
+        "UPDATE Users SET username=? WHERE uid=?;",
+        (name, uid)
+    )
+
     cfg.db_con.commit()
 
 

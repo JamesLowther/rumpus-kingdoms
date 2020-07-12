@@ -7,6 +7,7 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE Users (
     uid             text,
+    username        text,
     doubloons       int,
     rank            int,
     rumpus_count    int,

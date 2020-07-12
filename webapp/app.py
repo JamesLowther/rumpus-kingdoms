@@ -9,8 +9,16 @@ db_cur = db_con.cursor()
 
 @app.route('/')
 def index():
+    return render_template("index.html")
 
-    db_cur.execute("SELECT k.uid, k.k_name, CASE WHEN s.total_pop is NULL THEN 0 ELSE s.total_pop END as total_pop FROM Kingdoms k LEFT JOIN (SELECT v.kid, SUM(v.population) as total_pop FROM Villages v GROUP BY v.kid) s ON k.kid=s.kid ORDER BY total_pop DESC LIMIT 10;")
+@app.route('/rules.html')
+def rules():
+    return render_template("rules.html")
+
+@app.route('/score.html')
+def score():
+
+    db_cur.execute("SELECT u.username, k.k_name, CASE WHEN s.total_pop is NULL THEN 0 ELSE s.total_pop END as total_pop FROM Users u, Kingdoms k LEFT JOIN (SELECT v.kid, SUM(v.population) as total_pop FROM Villages v GROUP BY v.kid) s ON k.kid=s.kid WHERE u.uid=k.uid ORDER BY total_pop DESC LIMIT 10;")
     results = db_cur.fetchall()
 
     kingdoms = []
@@ -18,8 +26,7 @@ def index():
     if results:
         i = 1
         for kingdom in results:
-            username = "todo"
-            kingdoms.append({"index": "{:02d}".format(i), "username": username, "kingdom": kingdom['k_name'], "population":kingdom['total_pop']})
+            kingdoms.append({"index": "{:02d}".format(i), "username": kingdom['username'], "kingdom": kingdom['k_name'], "population":kingdom['total_pop']})
             i += 1
 
-    return render_template("index.html", leaderboard=kingdoms)
+    return render_template("score.html", leaderboard=kingdoms)
