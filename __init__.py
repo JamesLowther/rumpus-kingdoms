@@ -1,9 +1,11 @@
 from flask import Flask, render_template
-import sqlite3
+import sqlite3, os
 
 app = Flask(__name__)
 
-db_con = sqlite3.connect("./bot/database.db", check_same_thread=False)
+DB_PATH = os.path.dirname(os.path.abspath(__file__)) + '/bot/database.db'
+
+db_con = sqlite3.connect(DB_PATH, check_same_thread=False)
 db_con.row_factory = sqlite3.Row
 db_cur = db_con.cursor()
 
