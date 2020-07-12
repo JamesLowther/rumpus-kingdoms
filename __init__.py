@@ -3,7 +3,7 @@ import sqlite3
 
 app = Flask(__name__)
 
-db_con = sqlite3.connect("../src/database.db", check_same_thread=False)
+db_con = sqlite3.connect("./bot/database.db", check_same_thread=False)
 db_con.row_factory = sqlite3.Row
 db_cur = db_con.cursor()
 
