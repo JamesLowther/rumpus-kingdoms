@@ -52,8 +52,8 @@ async def init_kingdom(ctx, *args):
 def create_kingdom(ctx, kingdom_name):
     new_id = management.unique_ID("Kingdoms", "kid")
     cfg.db_cur.execute(
-        "INSERT INTO Kingdoms VALUES (?, ?, 0, 0, 0, 0, ?);",
-        (new_id, kingdom_name, str(ctx.author.id)),
+        "INSERT INTO Kingdoms VALUES (?, ?, 0, ?, 0, 0, ?);",
+        (new_id, kingdom_name, cfg.config['starter_defence'], str(ctx.author.id)),
     )
     cfg.db_con.commit()
 

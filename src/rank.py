@@ -9,6 +9,7 @@ def check_message(ctx):
 
     if "rumpus" in message:
         update_rumpus_count(ctx, 1)
+        currency.add_doubloons(ctx, 1)
 
 
 def update_rumpus_count(ctx, amount):
@@ -55,3 +56,10 @@ async def levelup_rank(ctx):
 def upgrade_level(ctx, new_rank):
     cfg.db_cur.execute("UPDATE Users SET rank=? WHERE uid=?;", (new_rank, str(ctx.author.id)))
     cfg.db_con.commit()
+
+
+def get_user_level(ctx):
+    cfg.db_cur.execute("SELECT rank FROM Users WHERE uid=?;", (str(ctx.author.id),))
+    result = cfg.db_cur.fetchone()
+
+    return result['rank']
