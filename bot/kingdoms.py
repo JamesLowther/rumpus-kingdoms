@@ -94,7 +94,7 @@ async def rename_kingdom(ctx, *args):
         )
         return
 
-    new_name = args[0]
+    new_name = " ".join(args[0:])
 
     await ctx.channel.send(
         ">>> Are you sure you would like to name your kingdom **"
