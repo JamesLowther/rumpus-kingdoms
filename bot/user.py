@@ -27,6 +27,10 @@ def get_general_help_string():
         cfg.PREFIX
         + "levelup                        :  Level up to the next rank\n"
     )
+    to_send += (
+        cfg.PREFIX
+        + "attack                         :  Attack another kingdom\n"
+    )
     to_send += cfg.PREFIX + "players                        :  List all players\n"
     to_send += (
         cfg.PREFIX
