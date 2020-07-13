@@ -23,19 +23,24 @@
         },
         {
             "name": "Rumpus Warrior",
-            "price": 300,
+            "price": 350,
             "attack": 4
         },
         {
+            "name": "Rumpus Archer",
+            "price": 580,
+            "attack": 7
+        },
+        {
             "name": "Rumpus Spearman",
-            "price": 900,
-            "attack": 14
+            "price": 1000,
+            "attack": 12
         }
     ],
     "defence_options": [
         {
             "name": "Cheapus Shieldman",
-            "price": 100,
+            "price": 75,
             "defence": 1
         },
         {
@@ -44,9 +49,14 @@
             "defence": 4
         },
         {
+            "name": "Rumpus Defender",
+            "price": 450,
+            "defence": 8
+        },
+        {
             "name": "Rumpus Vanguard",
             "price": 700,
-            "defence": 10
+            "defence": 15
         }
     ],
     "ranks": [
