@@ -16,8 +16,9 @@ import management, kingdoms, user, villages, currency, scheduled, warfare, rank
 
 
 def main():
-    (bot_token, db_path) = management.read_json()
+    (db_path, token_path) = management.read_json()
 
+    bot_token = read_bot_token(token_path)
     connect_db(db_path)
 
     cfg.scheduler = scheduled.Scheduler()
@@ -66,6 +67,15 @@ def check_user_exists(user_id):
     cfg.db_cur.execute("SELECT * FROM Users WHERE uid = ?;", (user_id,))
 
     return cfg.db_cur.fetchone() != None
+
+
+def read_bot_token(token_path):
+    
+    token_file = open(token_path, "r")
+    bot_token = token_file.readline()
+    token_file.close()
+
+    return bot_token
 
 
 main()

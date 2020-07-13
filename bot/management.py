@@ -91,10 +91,10 @@ def read_json():
     with open(CONFIG_FILE) as f:
         data = json.load(f)
 
-        bot_token = data["bot_token"]
+        token_path = os.path.dirname(os.path.realpath(__file__)) + "/" + data["token_name"]
         db_path = os.path.dirname(os.path.realpath(__file__)) + "/" + data["db_name"]
         cfg.config = data
 
         f.close()
 
-        return (bot_token, db_path)
+        return (db_path, token_path)
