@@ -20,8 +20,8 @@ async def list_players(ctx):
 
     kingdom_table = shared.create_table(
         "Kingdoms",
-        ["Name", "Kingdom", "# Villages", "Has Attacked Today", "Been Attacked Today"],
-        ["username", "k_name", "count", "has_attacked", "been_attacked"],
+        ["Name", "Kingdom", "# Villages"],
+        ["username", "k_name", "count"],
         converted_all_kingdoms,
         0,
         False,
