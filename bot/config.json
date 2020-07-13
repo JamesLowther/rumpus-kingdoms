@@ -11,7 +11,7 @@
     "tax_base": 1,
     "tax_change": 0.4,
     "reply_timeout": 15,
-    "collect_timeout": 43200,
+    "collect_timeout": 14400,
     "attack_timeout": 86399,
     "attacked_timeout": 86399,
 
