@@ -165,6 +165,8 @@ def get_has_attacked_time_remaining(ctx):
     prev_time = cfg.db_cur.fetchone()['has_attacked']
     delta_time = int(time()) - prev_time
 
+    print(delta_time)
+
     remaining_time = cfg.config['attack_timeout'] - delta_time
 
     remaining_time_string = strftime("%H hour(s), %M minute(s), and %S second(s)", gmtime(remaining_time))
@@ -277,7 +279,7 @@ async def handle_successful_attack(ctx, attacked_kingdom, number_attack_units):
     to_send += str(transferred_village["population"])
     to_send += "`!\n\nYou can attack again in **"
     to_send += get_has_attacked_time_remaining(ctx)
-    to_send+= "**!"
+    to_send += "**!"
 
     await ctx.channel.send(to_send)
 
@@ -351,10 +353,10 @@ def transfer_lowest_pop_village(from_kid, to_kid):
 
 
 def update_been_attacked(kid):
-    cfg.db_cur.execute("UPDATE Kingdoms SET been_attacked=? WHERE kid=?;", (int(time()), kid,))
+    cfg.db_cur.execute("UPDATE Kingdoms SET been_attacked=? WHERE kid=?;", (int(time()), kid))
     cfg.db_con.commit()
 
 
 def update_has_attacked(kid):
-    cfg.db_cur.execute("UPDATE Kingdoms SET has_attacked=? WHERE kid=?;", (int(time()), kid,))
+    cfg.db_cur.execute("UPDATE Kingdoms SET has_attacked=? WHERE kid=?;", (int(time()), kid))
     cfg.db_con.commit()

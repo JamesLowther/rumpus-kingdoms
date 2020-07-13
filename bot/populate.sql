@@ -46,4 +46,4 @@ CREATE TABLE Variables (
 );
 
 INSERT INTO Variables VALUES
-    ('tax_rate', 0);
+    ('tax_rate', 1.0);

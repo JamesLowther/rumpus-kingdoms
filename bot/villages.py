@@ -233,6 +233,9 @@ async def upgrade_village(ctx, args):
         await ctx.channel.send(">>> Village upgrade cancelled!")
         return
 
+    # Detract funds from user's account
+    shared.detract_funds(ctx, upgrade_price)
+
     # Update village name in database
     cfg.db_cur.execute(
         "UPDATE Villages SET population=population + ? WHERE vid=?;",
