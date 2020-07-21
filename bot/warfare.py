@@ -53,17 +53,18 @@ def get_all_non_attacked_kingdoms(ctx):
     all_kingdoms = get_all_kingdoms_for_attack(ctx)
 
     for kingdom in all_kingdoms:
-        if check_been_attacked_today(kingdom['uid']):
+        if check_been_attacked_today(kingdom["uid"]):
             all_kingdoms.remove(kingdom)
 
     return all_kingdoms
+
 
 @bot.command(name="attack")
 async def attack_user(ctx):
     # Check if session exists
     if await management.check_session_exists(ctx):
         return
-    
+
     else:
         management.add_session(ctx)
 
@@ -83,7 +84,9 @@ async def attack_user(ctx):
     )
 
     if len(all_kingdoms) == 0:
-        await ctx.channel.send(">>> There are currently no kingdoms that can be attacked!")
+        await ctx.channel.send(
+            ">>> There are currently no kingdoms that can be attacked!"
+        )
         management.remove_session(ctx)
         return
 
@@ -125,7 +128,7 @@ async def check_attack_prereqs(ctx):
         to_send = ">>> You have already attacked another kingdom recently! You can attack again in **"
         to_send += get_has_attacked_time_remaining(ctx)
         to_send += "**!"
-        
+
         await ctx.channel.send(to_send)
         return False
 
@@ -153,21 +156,21 @@ def check_has_attacked_today(ctx):
         "SELECT k.has_attacked FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
         (str(ctx.author.id),),
     )
-    prev_time = cfg.db_cur.fetchone()['has_attacked']
+    prev_time = cfg.db_cur.fetchone()["has_attacked"]
     delta_time = int(time()) - prev_time
-    
-    return delta_time < cfg.config['attack_timeout']
+
+    return delta_time < cfg.config["attack_timeout"]
 
 
 def check_been_attacked_today(uid):
     cfg.db_cur.execute(
         "SELECT k.been_attacked FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
-        (uid,)
+        (uid,),
     )
-    prev_time = cfg.db_cur.fetchone()['been_attacked']
+    prev_time = cfg.db_cur.fetchone()["been_attacked"]
     delta_time = int(time()) - prev_time
-    
-    return delta_time < cfg.config['attacked_timeout']
+
+    return delta_time < cfg.config["attacked_timeout"]
 
 
 def get_has_attacked_time_remaining(ctx):
@@ -175,14 +178,16 @@ def get_has_attacked_time_remaining(ctx):
         "SELECT k.has_attacked FROM Users u, Kingdoms k WHERE u.uid=k.uid AND u.uid=?;",
         (str(ctx.author.id),),
     )
-    prev_time = cfg.db_cur.fetchone()['has_attacked']
+    prev_time = cfg.db_cur.fetchone()["has_attacked"]
     delta_time = int(time()) - prev_time
 
     print(delta_time)
 
-    remaining_time = cfg.config['attack_timeout'] - delta_time
+    remaining_time = cfg.config["attack_timeout"] - delta_time
 
-    remaining_time_string = strftime("%H hour(s), %M minute(s), and %S second(s)", gmtime(remaining_time))
+    remaining_time_string = strftime(
+        "%H hour(s), %M minute(s), and %S second(s)", gmtime(remaining_time)
+    )
     return remaining_time_string
 
 
@@ -366,10 +371,14 @@ def transfer_lowest_pop_village(from_kid, to_kid):
 
 
 def update_been_attacked(kid):
-    cfg.db_cur.execute("UPDATE Kingdoms SET been_attacked=? WHERE kid=?;", (int(time()), kid))
+    cfg.db_cur.execute(
+        "UPDATE Kingdoms SET been_attacked=? WHERE kid=?;", (int(time()), kid)
+    )
     cfg.db_con.commit()
 
 
 def update_has_attacked(kid):
-    cfg.db_cur.execute("UPDATE Kingdoms SET has_attacked=? WHERE kid=?;", (int(time()), kid))
+    cfg.db_cur.execute(
+        "UPDATE Kingdoms SET has_attacked=? WHERE kid=?;", (int(time()), kid)
+    )
     cfg.db_con.commit()

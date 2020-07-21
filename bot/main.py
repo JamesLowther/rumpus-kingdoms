@@ -70,7 +70,7 @@ def check_user_exists(user_id):
 
 
 def read_bot_token(token_path):
-    
+
     token_file = open(token_path, "r")
     bot_token = token_file.readline()
     token_file.close()

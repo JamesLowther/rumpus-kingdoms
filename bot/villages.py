@@ -10,7 +10,7 @@ async def village_options(ctx, *args):
     # Check if session exists
     if await management.check_session_exists(ctx):
         return
-    
+
     else:
         management.add_session(ctx)
 
@@ -176,7 +176,8 @@ async def buy_village(ctx, args):
     new_id = management.unique_ID("Villages", "vid")
 
     cfg.db_cur.execute(
-        "INSERT INTO Villages VALUES (?, ?, ?, ?)", (new_id, village_name, cfg.config['village_pop_base'], kid)
+        "INSERT INTO Villages VALUES (?, ?, ?, ?)",
+        (new_id, village_name, cfg.config["village_pop_base"], kid),
     )
 
     cfg.db_con.commit()
@@ -319,36 +320,45 @@ async def rename_village(ctx, args):
 def get_total_population(ctx):
     cfg.db_cur.execute(
         "SELECT CASE WHEN s.total_pop is NULL THEN 0 ELSE s.total_pop END as total_pop FROM Users u, Kingdoms k LEFT JOIN (SELECT v.kid, SUM(v.population) as total_pop FROM Villages v GROUP BY v.kid) s ON k.kid=s.kid WHERE u.uid=k.uid AND u.uid=?;",
-        (str(ctx.author.id),)
+        (str(ctx.author.id),),
     )
     result = cfg.db_cur.fetchone()
 
-    return result['total_pop']
+    return result["total_pop"]
 
 
 def calculate_village_price(ctx):
-    
+
     total_pop = get_total_population(ctx)
 
     user_rank = rank.get_user_level(ctx)
-    price = int(cfg.config['village_price_base'] + (total_pop * cfg.config['ranks'][user_rank]['modifier']))
-    
+    price = int(
+        cfg.config["village_price_base"]
+        + (total_pop * cfg.config["ranks"][user_rank]["modifier"])
+    )
+
     return price
 
 
 def calculate_upgrade_price(ctx, village):
-    village_pop = village['population']
+    village_pop = village["population"]
 
     user_rank = rank.get_user_level(ctx)
-    price = int(cfg.config['village_upgrade_price_base'] + (village_pop * cfg.config['ranks'][user_rank]['modifier']))
-    
+    price = int(
+        cfg.config["village_upgrade_price_base"]
+        + (village_pop * cfg.config["ranks"][user_rank]["modifier"])
+    )
+
     return price
 
 
 def calculate_population_increase(ctx, village):
-    village_pop = village['population']
+    village_pop = village["population"]
 
     user_rank = rank.get_user_level(ctx)
-    increase = int(cfg.config['village_pop_increase'] + (village_pop * (1 - cfg.config['ranks'][user_rank]['modifier'])))
-    
+    increase = int(
+        cfg.config["village_pop_increase"]
+        + (village_pop * (1 - cfg.config["ranks"][user_rank]["modifier"]))
+    )
+
     return increase

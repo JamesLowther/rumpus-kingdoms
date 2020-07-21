@@ -12,7 +12,7 @@ async def collect_tax(ctx):
     # Check if session exists
     if await management.check_session_exists(ctx):
         return
-    
+
     else:
         management.add_session(ctx)
 
@@ -41,8 +41,10 @@ async def collect_tax(ctx):
     )
     result = cfg.db_cur.fetchone()
 
-    if result['num_villages'] == 0:
-        await ctx.channel.send(">>> You need to have at least one village before you can collect taxes!")
+    if result["num_villages"] == 0:
+        await ctx.channel.send(
+            ">>> You need to have at least one village before you can collect taxes!"
+        )
         management.remove_session(ctx)
         return
 
@@ -63,7 +65,7 @@ async def show_tax_rate(ctx):
     # Check if session exists
     if await management.check_session_exists(ctx):
         return
-    
+
     else:
         management.add_session(ctx)
 
@@ -81,22 +83,25 @@ async def show_tax_rate(ctx):
 # Returns true if tax collection flag is set
 def check_tax_collected_today(ctx):
     cfg.db_cur.execute("SELECT tax_collected FROM Users WHERE uid=?;", (ctx.author.id,))
-    prev_time = cfg.db_cur.fetchone()['tax_collected']
+    prev_time = cfg.db_cur.fetchone()["tax_collected"]
     delta_time = int(time()) - prev_time
 
-    return delta_time < cfg.config['collect_timeout']
+    return delta_time < cfg.config["collect_timeout"]
 
 
 def get_collect_time_remaining(ctx):
-    
+
     cfg.db_cur.execute("SELECT tax_collected FROM Users WHERE uid=?;", (ctx.author.id,))
-    prev_time = cfg.db_cur.fetchone()['tax_collected']
+    prev_time = cfg.db_cur.fetchone()["tax_collected"]
     delta_time = int(time()) - prev_time
 
-    remaining_time = cfg.config['collect_timeout'] - delta_time
+    remaining_time = cfg.config["collect_timeout"] - delta_time
 
-    remaining_time_string = strftime("%H hour(s), %M minute(s), and %S second(s)", gmtime(remaining_time))
+    remaining_time_string = strftime(
+        "%H hour(s), %M minute(s), and %S second(s)", gmtime(remaining_time)
+    )
     return remaining_time_string
+
 
 # Sets the tax collected to a new value
 def update_tax_collected(ctx):

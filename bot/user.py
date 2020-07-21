@@ -24,13 +24,9 @@ def get_general_help_string():
         + "info                           :  Show your current player/kingdom information\n"
     )
     to_send += (
-        cfg.PREFIX
-        + "levelup                        :  Level up to the next rank\n"
+        cfg.PREFIX + "levelup                        :  Level up to the next rank\n"
     )
-    to_send += (
-        cfg.PREFIX
-        + "attack                         :  Attack another kingdom\n"
-    )
+    to_send += cfg.PREFIX + "attack                         :  Attack another kingdom\n"
     to_send += cfg.PREFIX + "players                        :  List all players\n"
     to_send += (
         cfg.PREFIX
@@ -56,8 +52,12 @@ async def display_user_info(ctx):
     result = cfg.db_cur.fetchone()
 
     if result:
-        to_send = ">>> **" + str(ctx.author) + "** of **" + str(result["k_name"]) + "**\n\n"
-        to_send += "**Rank:** `" + str(cfg.config['ranks'][result["rank"]]['name']) + "`\n"
+        to_send = (
+            ">>> **" + str(ctx.author) + "** of **" + str(result["k_name"]) + "**\n\n"
+        )
+        to_send += (
+            "**Rank:** `" + str(cfg.config["ranks"][result["rank"]]["name"]) + "`\n"
+        )
         to_send += "**Rumpuses:** `" + str(result["rumpus_count"]) + "`\n"
         to_send += "**Total Pop:** `" + str(villages.get_total_population(ctx)) + "`\n"
         to_send += "**Doubloons:** `" + str(result["doubloons"]) + "`\n"

@@ -10,7 +10,7 @@ async def init_kingdom(ctx, *args):
     # Check if session exists
     if await management.check_session_exists(ctx):
         return
-    
+
     else:
         management.add_session(ctx)
 
@@ -60,12 +60,13 @@ async def init_kingdom(ctx, *args):
 
     management.remove_session(ctx)
 
+
 # Insert the kingdom into the database
 def create_kingdom(ctx, kingdom_name):
     new_id = management.unique_ID("Kingdoms", "kid")
     cfg.db_cur.execute(
         "INSERT INTO Kingdoms VALUES (?, ?, 0, ?, 0, 0, ?);",
-        (new_id, kingdom_name, cfg.config['starter_defence'], str(ctx.author.id)),
+        (new_id, kingdom_name, cfg.config["starter_defence"], str(ctx.author.id)),
     )
     cfg.db_con.commit()
 
@@ -96,7 +97,7 @@ async def rename_kingdom(ctx, *args):
     # Check if session exists
     if await management.check_session_exists(ctx):
         return
-    
+
     else:
         management.add_session(ctx)
 
@@ -159,7 +160,7 @@ async def buy_troops(ctx, *args):
     # Check if session exists
     if await management.check_session_exists(ctx):
         return
-    
+
     else:
         management.add_session(ctx)
 

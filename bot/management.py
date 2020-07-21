@@ -55,20 +55,18 @@ def create_user(ctx):
     )
     cfg.db_con.commit()
 
+
 def update_all_usernames():
     cfg.db_cur.execute("SELECT uid FROM Users;")
     all_users = cfg.db_cur.fetchall()
 
     for user in all_users:
-        uid = user['uid']
+        uid = user["uid"]
         update_username(str(uid), cfg.bot.get_user(int(uid)).name)
 
 
 def update_username(uid, name):
-    cfg.db_cur.execute(
-        "UPDATE Users SET username=? WHERE uid=?;",
-        (name, uid)
-    )
+    cfg.db_cur.execute("UPDATE Users SET username=? WHERE uid=?;", (name, uid))
 
     cfg.db_con.commit()
 
@@ -92,7 +90,9 @@ def read_json():
     with open(CONFIG_FILE) as f:
         data = json.load(f)
 
-        token_path = os.path.dirname(os.path.realpath(__file__)) + "/" + data["token_name"]
+        token_path = (
+            os.path.dirname(os.path.realpath(__file__)) + "/" + data["token_name"]
+        )
         db_path = os.path.dirname(os.path.realpath(__file__)) + "/" + data["db_name"]
         cfg.config = data
 
@@ -101,17 +101,23 @@ def read_json():
         return (db_path, token_path)
 
 
+# Creates a new user command session
 def add_session(ctx):
     cfg.sessions.add(ctx.author.id)
 
 
+# Checks if a user command session already exists
+# Sends a error message if it does
 async def check_session_exists(ctx):
     if ctx.author.id in cfg.sessions:
-        await ctx.channel.send(">>> You are already running a command! Please cancel the current command or wait for it to timeout!")
+        await ctx.channel.send(
+            ">>> You are already running a command! Please cancel the current command or wait for it to timeout!"
+        )
         return True
 
     return False
 
 
+# Removes a user's command session
 def remove_session(ctx):
     cfg.sessions.discard(ctx.author.id)
