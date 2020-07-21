@@ -3,15 +3,23 @@ from cfg import bot
 
 from random import uniform, choice
 from time import time, strftime, gmtime
-import cfg, kingdoms
+import cfg, kingdoms, management
 
 
 # Collect tax from village population
 @bot.command(name="collect")
 async def collect_tax(ctx):
+    # Check if session exists
+    if await management.check_session_exists(ctx):
+        return
+    
+    else:
+        management.add_session(ctx)
+
     # Check if user has a kingdom
     if not kingdoms.check_has_kingdom(ctx):
         await kingdoms.handle_no_kingdom(ctx)
+        management.remove_session(ctx)
         return
 
     # Check if user has already collected tax
@@ -22,6 +30,8 @@ async def collect_tax(ctx):
         to_send += "**!"
 
         await ctx.channel.send(to_send)
+
+        management.remove_session(ctx)
         return
 
     # Count the total population of a kingdom
@@ -33,6 +43,7 @@ async def collect_tax(ctx):
 
     if result['num_villages'] == 0:
         await ctx.channel.send(">>> You need to have at least one village before you can collect taxes!")
+        management.remove_session(ctx)
         return
 
     total_pop = result["total_pop"]
@@ -44,9 +55,18 @@ async def collect_tax(ctx):
 
     await send_tax_collected_message(ctx, tax_collected, num_villages, total_pop)
 
+    management.remove_session(ctx)
+
 
 @bot.command(name="tax_rate")
 async def show_tax_rate(ctx):
+    # Check if session exists
+    if await management.check_session_exists(ctx):
+        return
+    
+    else:
+        management.add_session(ctx)
+
     tax_rate = get_tax_rate()
 
     to_send = ">>> "
@@ -54,6 +74,8 @@ async def show_tax_rate(ctx):
     to_send += "` doubloons per Rumplin."
 
     await ctx.channel.send(to_send)
+
+    management.remove_session(ctx)
 
 
 # Returns true if tax collection flag is set

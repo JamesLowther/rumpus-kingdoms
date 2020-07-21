@@ -7,14 +7,23 @@ import cfg, management, shared
 # Create a new kingdom for the user
 @bot.command(name="init")
 async def init_kingdom(ctx, *args):
+    # Check if session exists
+    if await management.check_session_exists(ctx):
+        return
+    
+    else:
+        management.add_session(ctx)
+
     # User already has a kingdom
     if check_has_kingdom(ctx):
         await handle_existing_kingdom(ctx)
+        management.remove_session(ctx)
         return
 
     # Incorrect number of arguments
     if len(args) == 0:
         await handle_no_kingdom(ctx)
+        management.remove_session(ctx)
         return
 
     kingdom_name = " ".join(args[0:])
@@ -36,17 +45,20 @@ async def init_kingdom(ctx, *args):
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        management.remove_session(ctx)
         return
 
     # User cancelled the kingdom creation
     if msg.content.lower() == "n":
         await ctx.channel.send(">>> Kingdom creation cancelled!")
+        management.remove_session(ctx)
         return
 
     create_kingdom(ctx, kingdom_name)
 
     await ctx.channel.send(">>> Kingdom **" + kingdom_name + "** created!")
 
+    management.remove_session(ctx)
 
 # Insert the kingdom into the database
 def create_kingdom(ctx, kingdom_name):
@@ -81,9 +93,17 @@ def check_has_kingdom(ctx):
 # Rename your kingdom
 @bot.command(name="rename_kingdom")
 async def rename_kingdom(ctx, *args):
+    # Check if session exists
+    if await management.check_session_exists(ctx):
+        return
+    
+    else:
+        management.add_session(ctx)
+
     # User doesn't have a kingdom
     if not check_has_kingdom(ctx):
         await handle_no_kingdom(ctx)
+        management.remove_session(ctx)
         return
 
     if len(args) == 0:
@@ -92,6 +112,7 @@ async def rename_kingdom(ctx, *args):
             + cfg.PREFIX
             + "rename <new name>` to rename your kingdom."
         )
+        management.remove_session(ctx)
         return
 
     new_name = " ".join(args[0:])
@@ -113,11 +134,13 @@ async def rename_kingdom(ctx, *args):
 
     except asyncio.TimeoutError:
         await ctx.channel.send(">>> You took too long to reply! Command cancelled.")
+        management.remove_session(ctx)
         return
 
     # User cancelled the kingdom creation
     if msg.content.lower() == "n":
         await ctx.channel.send(">>> Kingdom rename cancelled!")
+        management.remove_session(ctx)
         return
 
     cfg.db_cur.execute(
@@ -127,24 +150,38 @@ async def rename_kingdom(ctx, *args):
 
     await ctx.channel.send(">>> Kingdom renamed to **" + new_name + "**.")
 
+    management.remove_session(ctx)
+
 
 # Command to purchase new units
 @bot.command(name="shop")
 async def buy_troops(ctx, *args):
+    # Check if session exists
+    if await management.check_session_exists(ctx):
+        return
+    
+    else:
+        management.add_session(ctx)
+
     # User doesn't have a kingdom
     if not check_has_kingdom(ctx):
         await handle_no_kingdom(ctx)
+        management.remove_session(ctx)
         return
 
     # Show purchase options
     if len(args) == 0:
         await show_shop_help(ctx)
+
+        management.remove_session(ctx)
         return
 
     action = args[0].lower()
 
     if action == "list":
         await show_purchase_options(ctx)
+
+        management.remove_session(ctx)
         return
 
     elif action == "buy":
@@ -154,13 +191,19 @@ async def buy_troops(ctx, *args):
                 + cfg.PREFIX
                 + "shop buy <index> [amount]` to purchase a new unit."
             )
+
+            management.remove_session(ctx)
             return
 
         await purchase_unit(ctx, args)
 
     else:
         await show_shop_help(ctx)
+
+        management.remove_session(ctx)
         return
+
+    management.remove_session(ctx)
 
 
 async def purchase_unit(ctx, args):

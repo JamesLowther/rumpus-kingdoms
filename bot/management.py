@@ -35,6 +35,7 @@ async def reload_config(ctx):
 
     if check_root(ctx.author.id):
         read_json()
+        cfg.sessions = set()
         await ctx.channel.send(">>> Reload successful!")
 
     else:
@@ -98,3 +99,19 @@ def read_json():
         f.close()
 
         return (db_path, token_path)
+
+
+def add_session(ctx):
+    cfg.sessions.add(ctx.author.id)
+
+
+async def check_session_exists(ctx):
+    if ctx.author.id in cfg.sessions:
+        await ctx.channel.send(">>> You are already running a command! Please cancel the current command or wait for it to timeout!")
+        return True
+
+    return False
+
+
+def remove_session(ctx):
+    cfg.sessions.discard(ctx.author.id)

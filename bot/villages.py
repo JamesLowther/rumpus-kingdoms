@@ -7,14 +7,22 @@ import cfg, management, shared, kingdoms, rank
 
 @bot.command(name="village")
 async def village_options(ctx, *args):
+    # Check if session exists
+    if await management.check_session_exists(ctx):
+        return
+    
+    else:
+        management.add_session(ctx)
 
     # Check if user has a kingdom
     if not kingdoms.check_has_kingdom(ctx):
         await kingdoms.handle_no_kingdom(ctx)
+        management.remove_session(ctx)
         return
 
     if len(args) == 0:
         await show_village_help(ctx)
+        management.remove_session(ctx)
         return
 
     action = args[0].lower()
@@ -29,6 +37,7 @@ async def village_options(ctx, *args):
                 + cfg.PREFIX
                 + "village buy <name>` to purchase a new village."
             )
+            management.remove_session(ctx)
             return
 
         await buy_village(ctx, args)
@@ -40,6 +49,7 @@ async def village_options(ctx, *args):
                 + cfg.PREFIX
                 + "village upgrade <index>` to upgrade a village."
             )
+            management.remove_session(ctx)
             return
 
         await upgrade_village(ctx, args)
@@ -51,12 +61,15 @@ async def village_options(ctx, *args):
                 + cfg.PREFIX
                 + "village rename <index> <name>` to rename a village."
             )
+            management.remove_session(ctx)
             return
 
         await rename_village(ctx, args)
 
     else:
         await show_village_help(ctx)
+
+    management.remove_session(ctx)
 
 
 async def show_village_help(ctx):

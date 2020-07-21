@@ -3,7 +3,7 @@ from cfg import bot
 
 from time import time, strftime, gmtime
 import asyncio
-import cfg, shared, kingdoms
+import cfg, shared, kingdoms, management
 
 
 @bot.command(name="players")
@@ -60,13 +60,21 @@ def get_all_non_attacked_kingdoms(ctx):
 
 @bot.command(name="attack")
 async def attack_user(ctx):
+    # Check if session exists
+    if await management.check_session_exists(ctx):
+        return
+    
+    else:
+        management.add_session(ctx)
 
     # Check if user has a kingdom
     if not kingdoms.check_has_kingdom(ctx):
         await kingdoms.handle_no_kingdom(ctx)
+        management.remove_session(ctx)
         return
 
     if not await check_attack_prereqs(ctx):
+        management.remove_session(ctx)
         return
 
     all_kingdoms = get_all_non_attacked_kingdoms(ctx)
@@ -76,14 +84,17 @@ async def attack_user(ctx):
 
     if len(all_kingdoms) == 0:
         await ctx.channel.send(">>> There are currently no kingdoms that can be attacked!")
+        management.remove_session(ctx)
         return
 
     attacked_kingdom = await choose_kingdom_to_attack(ctx, converted_all_kingdoms)
     if not attacked_kingdom:
+        management.remove_session(ctx)
         return
 
     number_attack_units = await choose_number_attack_units(ctx)
     if not number_attack_units:
+        management.remove_session(ctx)
         return
 
     attacked_kingdom_units = get_number_units(str(attacked_kingdom["uid"]))

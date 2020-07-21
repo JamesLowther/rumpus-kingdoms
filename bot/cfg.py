@@ -14,3 +14,6 @@ def init():
     global db_con, db_cur
     db_con = None
     db_cur = None
+
+    global sessions
+    sessions = set()

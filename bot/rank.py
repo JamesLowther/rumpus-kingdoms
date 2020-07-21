@@ -1,7 +1,7 @@
 from discord.ext import commands
 from cfg import bot
 
-import cfg, currency
+import cfg, currency, management
 
 def check_message(ctx):
 
@@ -19,6 +19,13 @@ def update_rumpus_count(ctx, amount):
 
 @bot.command(name="levelup")
 async def levelup_rank(ctx):
+    # Check if session exists
+    if await management.check_session_exists(ctx):
+        return
+    
+    else:
+        management.add_session(ctx)
+
     cfg.db_cur.execute("SELECT rank, rumpus_count FROM Users WHERE uid=?;", (str(ctx.author.id),))
     result = cfg.db_cur.fetchone()
     
@@ -27,6 +34,8 @@ async def levelup_rank(ctx):
 
     if (rank + 1) >= len(cfg.config['ranks']):
         await ctx.channel.send(">>> You are already the highest rank! Congratulations!")
+        
+        management.remove_session(ctx)
         return
 
     new_rank = cfg.config['ranks'][rank + 1]
@@ -50,7 +59,11 @@ async def levelup_rank(ctx):
         to_send += "` more rumpuses to upgrade to the next level!"
 
         await ctx.channel.send(to_send)
+
+        management.remove_session(ctx)
         return
+
+    management.remove_session(ctx)
 
 
 def upgrade_level(ctx, new_rank):
