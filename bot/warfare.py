@@ -105,6 +105,8 @@ async def attack_user(ctx):
     else:
         await handle_failed_attack(ctx, attacked_kingdom, number_attack_units)
 
+    management.remove_session(ctx)
+
 
 async def check_attack_prereqs(ctx):
     if not get_village_count(ctx) > 0:
