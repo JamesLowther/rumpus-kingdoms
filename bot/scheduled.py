@@ -23,12 +23,13 @@ class Scheduler:
         print("Scheduler stopped")
 
     def schedule_loop(self):
+        print("Scheduler started")
         while self.running:
             schedule.run_pending()
             time.sleep(1)
 
 
 # Add scheduled events here
-schedule.every().day.at("23:59").do(currency.calculate_new_tax_rate)
-schedule.every().day.at("23:59").do(management.update_all_usernames)
+#schedule.every().day.at("23:59").do(currency.calculate_new_tax_rate)
+#schedule.every().day.at("23:59").do(management.update_all_usernames)
 # schedule.every(3).seconds.do(test)

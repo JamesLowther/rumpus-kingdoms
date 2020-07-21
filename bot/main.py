@@ -21,7 +21,8 @@ def main():
     bot_token = read_bot_token(token_path)
     connect_db(db_path)
 
-    cfg.scheduler = scheduled.Scheduler()
+    # Removed scheduler until a solution to database threading can be found
+    #cfg.scheduler = scheduled.Scheduler()
 
     cfg.bot.run(bot_token)
 
