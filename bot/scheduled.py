@@ -30,6 +30,6 @@ class Scheduler:
 
 
 # Add scheduled events here
-#schedule.every().day.at("23:59").do(currency.calculate_new_tax_rate)
-#schedule.every().day.at("23:59").do(management.update_all_usernames)
+# schedule.every().day.at("23:59").do(currency.calculate_new_tax_rate)
+# schedule.every().day.at("23:59").do(management.update_all_usernames)
 # schedule.every(3).seconds.do(test)

@@ -22,7 +22,7 @@ def main():
     connect_db(db_path)
 
     # Removed scheduler until a solution to database threading can be found
-    #cfg.scheduler = scheduled.Scheduler()
+    # cfg.scheduler = scheduled.Scheduler()
 
     cfg.bot.run(bot_token)
 

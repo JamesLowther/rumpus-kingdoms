@@ -17,7 +17,7 @@ async def shutdown(ctx):
 
     if check_root(ctx.author.id):
         cfg.db_con.close()
-        #cfg.scheduler.shutdown_threads()
+        # cfg.scheduler.shutdown_threads()
 
         await ctx.channel.send(
             ">>> The rumpus room remains unguarded. Tread carefully."
