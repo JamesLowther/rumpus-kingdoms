@@ -258,7 +258,7 @@ async def upgrade_village(ctx, args):
 
     cfg.db_con.commit()
 
-    await ctx.channel.send("Village successfully upgraded!")
+    await ctx.channel.send(">>> Village successfully upgraded!")
 
 
 async def rename_village(ctx, args):
