@@ -17,7 +17,6 @@ def index():
 def rules():
     return render_template("rules.html")
 
-"""
 @app.route('/score.html')
 def score():
 
@@ -33,8 +32,9 @@ def score():
             i += 1
 
     return render_template("score.html", leaderboard=kingdoms)
-"""
 
+"""
 @app.route('/score.html')
 def score():
     return render_template("panic.html")
+"""
