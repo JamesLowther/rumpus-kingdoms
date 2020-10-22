@@ -1,5 +1,11 @@
 # Rumpus Kingdoms
 
+## Description
+Rumpus Kingdoms is a discord-driven attack-and-defend strategy game based around a medieval theme. Players can build a kingdom by settling villages. Attack and defence units could be purchased to attack other player's kingdoms. Complete with front-end scoreboard to track player status. Written with discord.py for the back-end and flask for the front-end website.
+
+## Requirements
+Requires discord.py, sqlite3, and flask
+
 ## How to Play
 
 ### How to Win
