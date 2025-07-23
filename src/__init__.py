@@ -20,7 +20,7 @@ def rules():
 @app.route('/score.html')
 def score():
 
-    db_cur.execute("SELECT u.username, k.k_name, CASE WHEN s.total_pop is NULL THEN 0 ELSE s.total_pop END as total_pop FROM Users u, Kingdoms k LEFT JOIN (SELECT v.kid, SUM(v.population) as total_pop FROM Villages v GROUP BY v.kid) s ON k.kid=s.kid WHERE u.uid=k.uid ORDER BY total_pop DESC;")
+    db_cur.execute("SELECT u.username, k.k_name, sum(v.population) as total_pop FROM Users u join Kingdoms k on u.uid = k.uid join Villages v on v.kid = k.kid GROUP BY u.username, k.k_name ORDER BY total_pop DESC;")
     results = db_cur.fetchall()
 
     kingdoms = []
