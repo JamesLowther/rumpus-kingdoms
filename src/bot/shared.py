@@ -2,6 +2,7 @@ from cfg import bot
 
 import cfg
 
+
 # Check if a user can afford a certain price
 def check_funds_available(ctx, price, amount):
     total_price = price * amount

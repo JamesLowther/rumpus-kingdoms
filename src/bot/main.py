@@ -10,6 +10,7 @@ cfg.init()
 # The bot is being stored as a builtin
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(command_prefix=cfg.PREFIX, intents=intents)
 bot.remove_command("help")
